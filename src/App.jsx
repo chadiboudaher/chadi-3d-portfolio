@@ -1,16 +1,24 @@
 import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import PortfolioModel from "./three/PortfolioModel";
 
 function App() {
   return (
-    <Canvas>
-      <ambientLight intensity={1} />
+    <Canvas
+      camera={{
+        position: [8, 6, 10],
+        fov: 40,
+      }}
+    >
+      <color attach="background" args={["#A9C7D9"]} />
 
-      <directionalLight position={[5, 5, 5]} intensity={2} />
+      <ambientLight intensity={0.8} />
 
-      <mesh>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial color="orange" />
-      </mesh>
+      <directionalLight position={[5, 10, 5]} intensity={2} />
+
+      <PortfolioModel />
+
+      <OrbitControls />
     </Canvas>
   );
 }
