@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
 
-const MODEL_PATH = "/models/portfolio_scene.glb";
+const MODEL_PATH = "/models/portfolio.glb";
 
 export default function PortfolioModel({ onLoaded }) {
   const { scene } = useGLTF(MODEL_PATH);

@@ -2,8 +2,8 @@ import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { MathUtils } from "three";
 
-const TARGET = [0.3, 1.2, -0.5];
-const DESKTOP_POSITION = [9.2, 6.4, 13.2];
+const TARGET = [2, 2.2, -3];
+const DESKTOP_POSITION = [27, 5.4, -4];
 const MOBILE_POSITION = [13.4, 8.9, 18.7];
 
 export default function CameraRig() {
