@@ -1,9 +1,9 @@
 import { useGLTF } from "@react-three/drei";
 
 export default function PortfolioModel() {
-  const { scene } = useGLTF("/models/portfolio-v2.glb");
+  const { scene } = useGLTF("/models/portfolio.glb");
 
   return <primitive object={scene} />;
 }
 
-useGLTF.preload("/models/portfolio-v2.glb");
+useGLTF.preload("/models/portfolio.glb");
