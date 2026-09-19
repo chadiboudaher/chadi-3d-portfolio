@@ -3,7 +3,7 @@ import { useGLTF } from "@react-three/drei";
 import { gsap } from "gsap";
 
 const MODEL_PATH = "/models/portfolio.glb";
-const HOVER_SCALE = 1.06;
+const HOVER_SCALE = 1.15;
 const HOVER_TWEEN = {
   duration: 0.25,
   ease: "power2.out",
