@@ -2,7 +2,7 @@ import CameraRig from "./CameraRig";
 import Lighting from "./Lighting";
 import PortfolioModel from "./PortfolioModel";
 
-export default function Experience({ onLoaded }) {
+export default function Experience({ onLoaded, controlsEnabled }) {
   return (
     <>
       <color attach="background" args={["#ffe29a"]} />
@@ -10,6 +10,7 @@ export default function Experience({ onLoaded }) {
       <Lighting />
       <PortfolioModel onLoaded={onLoaded} />
       <CameraRig />
+      <CameraRig controlsEnabled={controlsEnabled} />
     </>
   );
 }

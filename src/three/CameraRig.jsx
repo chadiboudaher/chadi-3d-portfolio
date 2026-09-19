@@ -6,7 +6,7 @@ const TARGET = [2, 2.2, -3];
 const DESKTOP_POSITION = [27, 5.4, -4];
 const MOBILE_POSITION = [13.4, 8.9, 18.7];
 
-export default function CameraRig() {
+export default function CameraRig({ controlsEnabled }) {
   const width = useThree((state) => state.size.width);
   const height = useThree((state) => state.size.height);
   const isMobile = width < 700 || width / height < 0.85;
@@ -23,6 +23,7 @@ export default function CameraRig() {
       />
       <OrbitControls
         makeDefault
+        enabled={controlsEnabled}
         target={TARGET}
         enableDamping
         dampingFactor={0.065}

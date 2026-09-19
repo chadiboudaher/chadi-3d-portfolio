@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import LoadingScreen from "./components/LoadingScreen";
@@ -6,8 +6,26 @@ import NavigationHint from "./components/NavigationHint";
 import Experience from "./three/Experience";
 
 function App() {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const handleLoaded = useCallback(() => setIsLoaded(true), []);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [minimumDurationElapsed, setMinimumDurationElapsed] = useState(false);
+  const [isEntering, setIsEntering] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const isReady = assetsLoaded && minimumDurationElapsed;
+
+  const handleLoaded = useCallback(() => setAssetsLoaded(true), []);
+  const handleEnter = useCallback(() => {
+    if (!isReady || isEntering) return;
+    setIsEntering(true);
+  }, [isEntering, isReady]);
+  const handleEntered = useCallback(() => setHasEntered(true), []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(
+      () => setMinimumDurationElapsed(true),
+      2800,
+    );
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   return (
     <main className="experience" aria-label="Interactive campsite portfolio">
@@ -25,11 +43,18 @@ function App() {
         }}
       >
         <Suspense fallback={null}>
-          <Experience onLoaded={handleLoaded} />
+          <Experience onLoaded={handleLoaded} controlsEnabled={hasEntered} />
         </Suspense>
       </Canvas>
-      <LoadingScreen isLoaded={isLoaded} />
-      <NavigationHint visible={isLoaded} />
+      {!hasEntered && (
+        <LoadingScreen
+          isReady={isReady}
+          isEntering={isEntering}
+          onEnter={handleEnter}
+          onEntered={handleEntered}
+        />
+      )}
+      <NavigationHint visible={hasEntered} />
     </main>
   );
 }
