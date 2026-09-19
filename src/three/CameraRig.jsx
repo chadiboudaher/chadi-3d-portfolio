@@ -1,0 +1,41 @@
+import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
+import { MathUtils } from "three";
+
+const TARGET = [0.3, 1.2, -0.5];
+const DESKTOP_POSITION = [9.2, 6.4, 13.2];
+const MOBILE_POSITION = [13.4, 8.9, 18.7];
+
+export default function CameraRig() {
+  const width = useThree((state) => state.size.width);
+  const height = useThree((state) => state.size.height);
+  const isMobile = width < 700 || width / height < 0.85;
+
+  return (
+    <>
+      <PerspectiveCamera
+        key={isMobile ? "mobile" : "desktop"}
+        makeDefault
+        position={isMobile ? MOBILE_POSITION : DESKTOP_POSITION}
+        fov={isMobile ? 43 : 40}
+        near={0.1}
+        far={150}
+      />
+      <OrbitControls
+        makeDefault
+        target={TARGET}
+        enableDamping
+        dampingFactor={0.065}
+        enablePan={false}
+        minDistance={7}
+        maxDistance={30}
+        minPolarAngle={MathUtils.degToRad(28)}
+        maxPolarAngle={MathUtils.degToRad(78)}
+        minAzimuthAngle={MathUtils.degToRad(-115)}
+        maxAzimuthAngle={MathUtils.degToRad(115)}
+        rotateSpeed={0.65}
+        zoomSpeed={0.75}
+      />
+    </>
+  );
+}
