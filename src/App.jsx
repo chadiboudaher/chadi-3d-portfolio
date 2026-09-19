@@ -1,25 +1,36 @@
+import { Suspense, useCallback, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import PortfolioModel from "./three/PortfolioModel";
+import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
+import LoadingScreen from "./components/LoadingScreen";
+import NavigationHint from "./components/NavigationHint";
+import Experience from "./three/Experience";
 
 function App() {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const handleLoaded = useCallback(() => setIsLoaded(true), []);
+
   return (
-    <Canvas
-      camera={{
-        position: [8, 6, 10],
-        fov: 40,
-      }}
-    >
-      <color attach="background" args={["#A9C7D9"]} />
-
-      <ambientLight intensity={0.8} />
-
-      <directionalLight position={[5, 10, 5]} intensity={2} />
-
-      <PortfolioModel />
-
-      <OrbitControls />
-    </Canvas>
+    <main className="experience" aria-label="Interactive campsite portfolio">
+      <Canvas
+        dpr={[1, 2]}
+        shadows
+        camera={{ position: [9.2, 6.4, 13.2], fov: 40, near: 0.1, far: 150 }}
+        gl={{
+          antialias: true,
+          alpha: false,
+          powerPreference: "high-performance",
+          outputColorSpace: SRGBColorSpace,
+          toneMapping: ACESFilmicToneMapping,
+          toneMappingExposure: 1,
+        }}
+      >
+        <Suspense fallback={null}>
+          <Experience onLoaded={handleLoaded} />
+        </Suspense>
+      </Canvas>
+      <LoadingScreen isLoaded={isLoaded} />
+      <NavigationHint visible={isLoaded} />
+    </main>
   );
 }
 

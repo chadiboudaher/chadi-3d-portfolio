@@ -1,9 +1,23 @@
+import { useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
 
-export default function PortfolioModel() {
-  const { scene } = useGLTF("/models/portfolio.glb");
+const MODEL_PATH = "/models/portfolio_scene.glb";
+
+export default function PortfolioModel({ onLoaded }) {
+  const { scene } = useGLTF(MODEL_PATH);
+
+  useEffect(() => {
+    scene.traverse((object) => {
+      if (!object.isMesh) return;
+
+      object.castShadow = true;
+      object.receiveShadow = true;
+    });
+
+    onLoaded();
+  }, [onLoaded, scene]);
 
   return <primitive object={scene} />;
 }
 
-useGLTF.preload("/models/portfolio.glb");
+useGLTF.preload(MODEL_PATH);
