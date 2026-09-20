@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { gsap } from "gsap";
+import { findHoverRoot, isAboutObject, isHoverObject } from "./interaction.js";
 
 const MODEL_PATH = "/models/portfolio.glb";
 const SATELLITE_ROTATION_AXIS = "y";
@@ -12,19 +13,6 @@ const HOVER_TWEEN = {
   ease: "power2.out",
   overwrite: true,
 };
-
-function findHoverRoot(object) {
-  let currentObject = object;
-
-  while (currentObject) {
-    if (currentObject.name.toLowerCase().includes("hover")) {
-      return currentObject;
-    }
-    currentObject = currentObject.parent;
-  }
-
-  return null;
-}
 
 export default function PortfolioModel({ onLoaded, onSectionSelect }) {
   const { scene } = useGLTF(MODEL_PATH);
@@ -86,7 +74,7 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
   useEffect(() => {
     const signScales = originalScales.current;
     scene.traverse((object) => {
-      if (object.name.toLowerCase().includes("hover")) {
+      if (isHoverObject(object)) {
         signScales.set(object, object.scale.clone());
       }
       if (object.isMesh) {
@@ -134,7 +122,7 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
   const handleClick = useCallback(
     (event) => {
       const sign = findHoverRoot(event.object);
-      if (!sign?.name.toLowerCase().includes("about")) return;
+      if (!sign || !isAboutObject(sign)) return;
 
       event.stopPropagation();
       onSectionSelect("about");
