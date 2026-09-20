@@ -48,7 +48,6 @@ function App() {
         }}
       >
         <Suspense fallback={null}>
-          <Experience onLoaded={handleLoaded} controlsEnabled={hasEntered} />
           <Experience
             onLoaded={handleLoaded}
             controlsEnabled={hasEntered && activeSection === null}

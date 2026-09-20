@@ -32,6 +32,19 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
     });
   }, []);
 
+  const resetHoveredSign = useCallback(() => {
+    const sign = hoveredSign.current;
+
+    if (sign) {
+      const originalScale = originalScales.current.get(sign);
+      gsap.killTweensOf(sign.scale);
+      if (originalScale) sign.scale.copy(originalScale);
+    }
+
+    hoveredSign.current = null;
+    document.body.style.cursor = "default";
+  }, []);
+
   const setHoveredSign = useCallback(
     (nextSign) => {
       if (hoveredSign.current === nextSign) return;
@@ -125,9 +138,10 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
       if (!sign || !isAboutObject(sign)) return;
 
       event.stopPropagation();
+      resetHoveredSign();
       onSectionSelect("about");
     },
-    [onSectionSelect],
+    [onSectionSelect, resetHoveredSign],
   );
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 
 const skillGroups = [
@@ -21,6 +21,27 @@ export default function AboutPanel({ onClose }) {
   const overlayRef = useRef(null);
   const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const isClosingRef = useRef(false);
+
+  const closePanel = useCallback(() => {
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+
+    gsap
+      .timeline({ onComplete: onClose })
+      .to(panelRef.current, {
+        y: 12,
+        scale: 0.98,
+        opacity: 0,
+        duration: 0.26,
+        ease: "power2.in",
+      })
+      .to(
+        overlayRef.current,
+        { autoAlpha: 0, duration: 0.2, ease: "power1.in" },
+        "-=0.16",
+      );
+  }, [onClose]);
 
   useLayoutEffect(() => {
     const context = gsap.context(() => {
@@ -38,21 +59,20 @@ export default function AboutPanel({ onClose }) {
 
     closeButtonRef.current?.focus();
     return () => context.revert();
-  }, []);
+  }, [closePanel]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") closePanel();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [closePanel]);
 
   const handleBackdropClick = (event) => {
-    if (event.target === event.currentTarget) onClose();
+    if (event.target === event.currentTarget) closePanel();
   };
-
   return (
     <div
       className="about-overlay"
@@ -71,7 +91,7 @@ export default function AboutPanel({ onClose }) {
           className="about-panel__close"
           ref={closeButtonRef}
           type="button"
-          onClick={onClose}
+          onClick={closePanel}
           aria-label="Close About panel"
         >
           <span aria-hidden="true">×</span>
