@@ -32,10 +32,10 @@ export default function CameraRig({ controlsEnabled }) {
         maxDistance={30}
         minPolarAngle={MathUtils.degToRad(28)}
         maxPolarAngle={MathUtils.degToRad(78)}
-        minAzimuthAngle={MathUtils.degToRad(-115)}
-        maxAzimuthAngle={MathUtils.degToRad(115)}
+        minAzimuthAngle={MathUtils.degToRad(19)}
+        maxAzimuthAngle={MathUtils.degToRad(190)}
         rotateSpeed={0.65}
-        zoomSpeed={0.75}
+        zoomSpeed={0.65}
       />
     </>
   );
