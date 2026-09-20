@@ -163,8 +163,7 @@ canvas {
   --compass-rim: #c96339;
   --compass-face: #f8df9d;
   --compass-ink: #70462c;
-  --compass-north: #d96a3a;
-  --compass-south: #e9b85f;
+  --compass-pointer: #d96a3a;
   display: block;
   width: min(100%, 15.5rem);
   padding: 0;
@@ -208,16 +207,14 @@ canvas {
   text-anchor: middle;
 }
 
-.mini-compass__needle {
-  transform-origin: 0 0;
+.mini-compass__pointer {
+  stroke: var(--compass-pointer);
+  stroke-linecap: round;
+  stroke-width: 7;
 }
 
-.mini-compass__needle-north {
-  fill: var(--compass-north);
-}
-
-.mini-compass__needle-south {
-  fill: var(--compass-south);
+.mini-compass__pointer-tip {
+  fill: var(--compass-pointer);
 }
 
 .mini-compass__pivot {

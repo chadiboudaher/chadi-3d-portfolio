@@ -17,42 +17,26 @@ const skillGroups = [
   },
 ];
 
-const COMPASS_POINTER_DURATION = 0.35;
+const COMPASS_CENTER = 120;
+const COMPASS_POINTER_LENGTH = 54;
+const COMPASS_POINTER_DURATION = 0.2;
 const COMPASS_SPIN_DURATION = 0.8;
 const COMPASS_SETTLE_DURATION = 0.5;
 
-const nearestEquivalentAngle = (currentAngle, targetAngle = 0) => {
-  const delta = ((((targetAngle - currentAngle) % 360) + 540) % 360) - 180;
-
-  return currentAngle + delta;
-};
-
 function MiniCompass() {
   const compassRef = useRef(null);
-  const needleRef = useRef(null);
+  const pointerRef = useRef(null);
   const spinTimelineRef = useRef(null);
   const isSpinningRef = useRef(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    const pointer = pointerRef.current;
     const compass = compassRef.current;
-    const needle = needleRef.current;
-
-    if (!compass || !needle) return;
-
-    const context = gsap.context(() => {
-      gsap.set(needle, {
-        transformOrigin: "0px 0px",
-        rotation: 0,
-      });
-    }, compass);
 
     return () => {
       spinTimelineRef.current?.kill();
-      spinTimelineRef.current = null;
-      isSpinningRef.current = false;
-      gsap.killTweensOf(needle);
+      gsap.killTweensOf(pointer);
       gsap.killTweensOf(compass);
-      context.revert();
     };
   }, []);
 
@@ -71,25 +55,21 @@ function MiniCompass() {
     const centerX = bounds.left + bounds.width / 2;
     const centerY = bounds.top + bounds.height / 2;
 
-    const x = event.clientX - centerX;
-    const y = event.clientY - centerY;
+    const dx = event.clientX - centerX;
+    const dy = event.clientY - centerY;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const pointer = pointerRef.current;
 
-    // +90 because the needle's default direction points upward.
-    const direction = (Math.atan2(y, x) * 180) / Math.PI + 90;
+    if (!pointer || length === 0) return;
 
-    const needle = needleRef.current;
-
-    if (!needle) return;
-
-    const currentRotation = Number(gsap.getProperty(needle, "rotation")) || 0;
-
-    const targetRotation = nearestEquivalentAngle(currentRotation, direction);
-
-    gsap.to(needle, {
-      rotation: targetRotation,
+    gsap.to(pointer, {
+      attr: {
+        x2: COMPASS_CENTER + (dx / length) * COMPASS_POINTER_LENGTH,
+        y2: COMPASS_CENTER + (dy / length) * COMPASS_POINTER_LENGTH,
+      },
       duration: COMPASS_POINTER_DURATION,
       ease: "power2.out",
-      overwrite: "auto",
+      overwrite: true,
     });
   };
 
@@ -118,37 +98,44 @@ function MiniCompass() {
 
     if (isSpinningRef.current) return;
 
-    const needle = needleRef.current;
+    const pointer = pointerRef.current;
 
-    if (!needle) return;
+    if (!pointer) return;
 
-    const currentRotation = Number(gsap.getProperty(needle, "rotation")) || 0;
-
-    // Return to North using the nearest equivalent of 0°.
-    const northRotation = nearestEquivalentAngle(currentRotation);
-
-    gsap.to(needle, {
-      rotation: northRotation,
+    gsap.to(pointer, {
+      attr: { x2: COMPASS_CENTER, y2: 66 },
       duration: 0.65,
       ease: "power2.out",
-      overwrite: "auto",
+      overwrite: true,
     });
   };
 
-  const spinNeedle = () => {
-    const needle = needleRef.current;
+  const spinPointer = () => {
+    const pointer = pointerRef.current;
 
-    if (!needle || isSpinningRef.current) return;
+    if (!pointer || isSpinningRef.current) return;
 
     isSpinningRef.current = true;
 
-    gsap.killTweensOf(needle);
+    const currentX = Number(pointer.getAttribute("x2")) - COMPASS_CENTER;
+    const currentY = Number(pointer.getAttribute("y2")) - COMPASS_CENTER;
+    const angle = {
+      value: (Math.atan2(currentX, -currentY) * 180) / Math.PI,
+    };
+    const updateEndpoint = () => {
+      const radians = (angle.value * Math.PI) / 180;
 
-    const currentRotation = Number(gsap.getProperty(needle, "rotation")) || 0;
-
-    const fullTurn = currentRotation + 360;
-
-    const northRotation = nearestEquivalentAngle(fullTurn);
+      pointer.setAttribute(
+        "x2",
+        COMPASS_CENTER + Math.sin(radians) * COMPASS_POINTER_LENGTH,
+      );
+      pointer.setAttribute(
+        "y2",
+        COMPASS_CENTER - Math.cos(radians) * COMPASS_POINTER_LENGTH,
+      );
+    };
+    const fullTurn = angle.value + 360;
+    const north = Math.round(fullTurn / 360) * 360;
 
     spinTimelineRef.current = gsap
       .timeline({
@@ -156,21 +143,21 @@ function MiniCompass() {
           isSpinningRef.current = false;
           spinTimelineRef.current = null;
 
-          // Prevent rotation numbers growing forever.
-          gsap.set(needle, {
-            rotation: 0,
-          });
+          pointer.setAttribute("x2", COMPASS_CENTER);
+          pointer.setAttribute("y2", 66);
         },
       })
-      .to(needle, {
-        rotation: fullTurn,
+      .to(angle, {
+        value: fullTurn,
         duration: COMPASS_SPIN_DURATION,
         ease: "power2.inOut",
+        onUpdate: updateEndpoint,
       })
-      .to(needle, {
-        rotation: northRotation,
+      .to(angle, {
+        value: north,
         duration: COMPASS_SETTLE_DURATION,
         ease: "back.out(1.7)",
+        onUpdate: updateEndpoint,
       });
   };
 
@@ -183,9 +170,22 @@ function MiniCompass() {
       onPointerMove={handlePointerMove}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
-      onClick={spinNeedle}
+      onClick={spinPointer}
     >
       <svg viewBox="0 0 240 240" aria-hidden="true">
+        <defs>
+          <marker
+            id="compass-arrow"
+            markerWidth="18"
+            markerHeight="18"
+            refX="10"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path className="mini-compass__pointer-tip" d="M0 0 10 5 0 10z" />
+          </marker>
+        </defs>
         <circle className="mini-compass__rim" cx="120" cy="120" r="106" />
 
         <circle className="mini-compass__face" cx="120" cy="120" r="92" />
@@ -214,14 +214,15 @@ function MiniCompass() {
           </text>
         </g>
 
-        {/* Place the needle at the center; rotate only its local 0,0 group. */}
-        <g transform="translate(120 120)">
-          <g className="mini-compass__needle" ref={needleRef}>
-            <path className="mini-compass__needle-north" d="M0-54 13 1-13 1z" />
-
-            <path className="mini-compass__needle-south" d="M0 54-13-1 13-1z" />
-          </g>
-        </g>
+        <line
+          className="mini-compass__pointer"
+          ref={pointerRef}
+          x1="120"
+          y1="120"
+          x2="120"
+          y2="66"
+          markerEnd="url(#compass-arrow)"
+        />
 
         {/* Center stays fixed */}
         <circle className="mini-compass__pivot" cx="120" cy="120" r="19" />
