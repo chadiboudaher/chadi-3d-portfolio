@@ -4,7 +4,7 @@ import { MathUtils } from "three";
 
 const TARGET = [2, 2.2, -3];
 const DESKTOP_POSITION = [27, 5.4, -4];
-const MOBILE_POSITION = [13.4, 8.9, 18.7];
+const MOBILE_POSITION = [47, 12, -6];
 
 export default function CameraRig({ controlsEnabled }) {
   const width = useThree((state) => state.size.width);
