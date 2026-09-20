@@ -60,7 +60,7 @@ export default function PortfolioModel({ onLoaded }) {
   );
 
   useEffect(() => {
-    const satellite = scene.getObjectByName("satellite_Root");
+    const satellite = scene.getObjectByName("Satellite_Rotate");
     if (!satellite) return undefined;
 
     const initialRotation = satellite.rotation[SATELLITE_ROTATION_AXIS];
