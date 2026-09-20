@@ -13,21 +13,13 @@ const HOVER_TWEEN = {
   overwrite: true,
 };
 
-const SECTION_BY_ROOT_NAME = {
-  about_hover: "about",
-  projects_hover: "projects",
-  contact_hover: "contact",
-};
-
-function findInteractiveRoot(object, scene) {
+function findHoverRoot(object) {
   let currentObject = object;
 
   while (currentObject) {
-    if (currentObject.name.toLowerCase().includes("_hover")) {
+    if (currentObject.name.toLowerCase().includes("hover")) {
       return currentObject;
     }
-
-    if (currentObject === scene) break;
     currentObject = currentObject.parent;
   }
 
@@ -59,7 +51,7 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
       if (hoveredSign.current) animateSign(hoveredSign.current, 1);
 
       hoveredSign.current = nextSign;
-      document.body.style.cursor = nextSign ? "pointer" : "";
+      document.body.style.cursor = nextSign ? "pointer" : "default";
 
       if (nextSign) animateSign(nextSign, HOVER_SCALE);
     },
@@ -94,7 +86,7 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
   useEffect(() => {
     const signScales = originalScales.current;
     scene.traverse((object) => {
-      if (object.name.toLowerCase().includes("_hover")) {
+      if (object.name.toLowerCase().includes("hover")) {
         signScales.set(object, object.scale.clone());
       }
       if (object.isMesh) {
@@ -111,18 +103,18 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
       });
       signScales.clear();
       hoveredSign.current = null;
-      document.body.style.cursor = "";
+      document.body.style.cursor = "default";
     };
   }, [onLoaded, scene]);
 
   const handlePointerMove = useCallback(
     (event) => {
-      const sign = findInteractiveRoot(event.object, scene);
+      const sign = findHoverRoot(event.object);
 
       if (sign) event.stopPropagation();
       setHoveredSign(sign);
     },
-    [scene, setHoveredSign],
+    [setHoveredSign],
   );
 
   const handlePointerOut = useCallback(
@@ -131,27 +123,23 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
       if (!currentSign) return;
 
       const isStillOverCurrentSign = event.intersections.some(
-        (intersection) =>
-          findInteractiveRoot(intersection.object, scene) === currentSign,
+        (intersection) => findHoverRoot(intersection.object) === currentSign,
       );
 
       if (!isStillOverCurrentSign) setHoveredSign(null);
     },
-    [scene, setHoveredSign],
+    [setHoveredSign],
   );
 
   const handleClick = useCallback(
     (event) => {
-      const sign = findInteractiveRoot(event.object, scene);
-      const section = sign
-        ? SECTION_BY_ROOT_NAME[sign.name.toLowerCase()]
-        : undefined;
-      if (!section) return;
+      const sign = findHoverRoot(event.object);
+      if (!sign?.name.toLowerCase().includes("about")) return;
 
       event.stopPropagation();
-      onSectionSelect(section);
+      onSectionSelect("about");
     },
-    [onSectionSelect, scene],
+    [onSectionSelect],
   );
 
   return (
