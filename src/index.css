@@ -51,8 +51,8 @@ canvas {
 
 .about-panel {
   position: relative;
-  width: min(58rem, 100%);
-  max-height: min(84vh, 50rem);
+  width: min(68rem, 100%);
+  max-height: min(88vh, 54rem);
   overflow: hidden;
   border: 2px solid rgb(255 255 255 / 55%);
   border-radius: 1.75rem;
@@ -63,10 +63,11 @@ canvas {
 }
 
 .about-panel__scroll {
-  max-height: min(84vh, 50rem);
+  max-height: min(88vh, 54rem);
+  overflow-x: hidden;
   overflow-y: auto;
-  padding: clamp(1.6rem, 4vw, 3rem);
-  padding-right: clamp(2rem, 5vw, 3.6rem);
+  padding: clamp(2rem, 4vw, 3.5rem);
+  padding-right: clamp(2.5rem, 5vw, 4.25rem);
   scrollbar-color: #d9854f transparent;
   scrollbar-width: thin;
 }
@@ -75,7 +76,7 @@ canvas {
   position: absolute;
   top: 0.9rem;
   right: 0.9rem;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   width: 2.5rem;
   height: 2.5rem;
@@ -99,15 +100,21 @@ canvas {
   box-shadow: 0 0.36rem 0 #a94e32;
 }
 
-.about-panel__close:focus-visible {
+.about-panel__close:focus-visible,
+.mini-compass:focus-visible {
   outline: 3px solid rgb(169 78 50 / 40%);
   outline-offset: 3px;
 }
 
-.about-panel__section + .about-panel__section {
-  margin-top: 1.75rem;
-  padding-top: 1.5rem;
-  border-top: 2px dashed rgb(217 106 58 / 30%);
+.about-panel__intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(15rem, 0.75fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.about-panel__section {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
 }
 
 .about-panel h1,
@@ -120,26 +127,22 @@ canvas {
 }
 
 .about-panel h1 {
-  margin-bottom: 1rem;
+  margin-bottom: 1.4rem;
   font-size: clamp(2rem, 5vw, 2.8rem);
   line-height: 1;
 }
 
 .about-panel h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
   font-size: clamp(1.4rem, 3.5vw, 1.8rem);
 }
 
 .about-panel__copy {
   display: grid;
-  gap: 0.8rem;
-  font-size: 0.96rem;
-  line-height: 1.58;
-}
-
-.about-panel__copy,
-.about-panel__detail p {
-  max-width: 46rem;
+  gap: 0.95rem;
+  color: #5e4a35;
+  font-size: 0.97rem;
+  line-height: 1.65;
 }
 
 .about-panel__hello {
@@ -148,115 +151,161 @@ canvas {
   font-weight: 750;
 }
 
-.about-panel__skills {
-  gap: 0;
+.about-panel__identity {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mini-compass {
+  --compass-rim: #c96339;
+  --compass-face: #f8df9d;
+  --compass-ink: #70462c;
+  --compass-north: #d96a3a;
+  --compass-south: #e9b85f;
+  display: block;
+  width: min(100%, 15.5rem);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transform-origin: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.mini-compass svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0.55rem 0 rgb(135 76 42 / 16%));
+}
+
+.mini-compass__rim {
+  fill: var(--compass-rim);
+}
+
+.mini-compass__face {
+  fill: var(--compass-face);
+  stroke: #fff4d6;
+  stroke-width: 4;
+}
+
+.mini-compass__ticks {
+  fill: none;
+  stroke: var(--compass-ink);
+  stroke-linecap: round;
+  stroke-width: 4;
+}
+
+.mini-compass__letters {
+  fill: var(--compass-ink);
+  font:
+    400 18px "Chewy",
+    system-ui;
+  text-anchor: middle;
+}
+
+.mini-compass__needle {
+  transform-box: fill-box;
+}
+
+.mini-compass__needle-north {
+  fill: var(--compass-north);
+}
+
+.mini-compass__needle-south {
+  fill: var(--compass-south);
+}
+
+.mini-compass__pivot {
+  fill: #fff7df;
+  stroke: var(--compass-ink);
+  stroke-width: 3;
+}
+
+.mini-compass__monogram {
+  fill: var(--compass-ink);
+  font:
+    800 13px Inter,
+    system-ui,
+    sans-serif;
+  text-anchor: middle;
+}
+
+.about-panel__name {
+  margin-top: 1rem;
+  color: #70462c;
+  font-size: 1.15rem;
+  font-weight: 750;
+}
+
+.about-panel__location {
+  margin-top: 0.22rem;
+  color: #8b6b48;
+  font-size: 0.9rem;
 }
 
 .about-panel__skill {
   display: grid;
-  grid-template-columns: minmax(7rem, 0.28fr) 1fr;
-  gap: 1.25rem;
+  grid-template-columns: minmax(7rem, 0.25fr) 1fr;
+  gap: 1.5rem;
   align-items: baseline;
-  padding: 0.85rem 0;
-  border-bottom: 1px solid rgb(169 78 50 / 18%);
+  padding: 0.68rem 0;
 }
 
-.about-panel__skill:first-child {
-  padding-top: 0;
-}
-
-.about-panel__skill:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.about-panel__skill h3,
-.about-panel__interest h3 {
+.about-panel__skill h3 {
   color: #70462c;
-  font-family: "Chewy", system-ui;
-  font-size: 1.08rem;
-  font-weight: 400;
-  letter-spacing: 0.02em;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 750;
 }
 
 .about-panel__skill p,
-.about-panel__exploring,
-.about-panel__detail p,
-.about-panel__interest p {
+.about-panel__exploring {
   color: #5e4a35;
-  font-size: 0.92rem;
-  line-height: 1.6;
+  font-size: 0.94rem;
+  line-height: 1.65;
 }
 
 .about-panel__exploring {
-  max-width: 48rem;
+  max-width: 52rem;
 }
 
-.about-panel__details {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.about-panel__detail h2 {
-  margin-bottom: 0.42rem;
-  font-size: clamp(1.15rem, 2.6vw, 1.45rem);
-}
-
-.about-panel__interests {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(1.5rem, 5vw, 4rem);
-}
-
-.about-panel__interest {
-  position: relative;
-  padding: 0.15rem 0 0.25rem 1rem;
-  transform-origin: left center;
-  touch-action: manipulation;
-}
-
-.about-panel__interest::before {
-  position: absolute;
-  top: 0.2rem;
-  bottom: 0.2rem;
-  left: 0;
-  width: 3px;
-  border-radius: 2px;
-  background: #d9854f;
-  content: "";
-}
-
-.about-panel__interest h3 {
-  margin-bottom: 0.3rem;
-}
-
-@media (max-width: 580px) {
+@media (max-width: 700px) {
   .about-overlay {
     align-items: end;
     padding: 0.75rem;
   }
 
+  .about-panel,
+  .about-panel__scroll {
+    max-height: 88vh;
+  }
+
   .about-panel {
-    max-height: 86vh;
     border-radius: 1.5rem;
   }
 
   .about-panel__scroll {
-    max-height: 86vh;
+    padding: 2rem 1.35rem 2.5rem;
   }
 
-  .about-panel__skills {
-    gap: 0;
+  .about-panel__intro {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+
+  .mini-compass {
+    width: min(70vw, 14rem);
   }
 
   .about-panel__skill {
     grid-template-columns: 1fr;
-    gap: 0.3rem;
-  }
-
-  .about-panel__interests {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 0.25rem;
+    padding: 0.72rem 0;
   }
 }
 
