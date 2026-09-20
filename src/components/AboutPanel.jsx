@@ -16,26 +16,43 @@ const skillGroups = [
     skills: "Git · Docker · Linux · FFmpeg",
   },
 ];
+
+const COMPASS_POINTER_DURATION = 0.35;
+const COMPASS_SPIN_DURATION = 0.8;
+const COMPASS_SETTLE_DURATION = 0.5;
+
+const nearestEquivalentAngle = (currentAngle, targetAngle = 0) => {
+  const delta = ((((targetAngle - currentAngle) % 360) + 540) % 360) - 180;
+
+  return currentAngle + delta;
+};
+
 function MiniCompass() {
   const compassRef = useRef(null);
   const needleRef = useRef(null);
+  const spinTimelineRef = useRef(null);
   const isSpinningRef = useRef(false);
 
   useLayoutEffect(() => {
+    const compass = compassRef.current;
     const needle = needleRef.current;
 
-    if (!needle) return;
+    if (!compass || !needle) return;
 
-    // Important for SVG rotation:
-    // always rotate around the center of the compass.
-    gsap.set(needle, {
-      svgOrigin: "120 120",
-      rotation: 0,
-    });
+    const context = gsap.context(() => {
+      gsap.set(needle, {
+        svgOrigin: "120 120",
+        rotation: 0,
+      });
+    }, compass);
 
     return () => {
+      spinTimelineRef.current?.kill();
+      spinTimelineRef.current = null;
+      isSpinningRef.current = false;
       gsap.killTweensOf(needle);
-      gsap.killTweensOf(compassRef.current);
+      gsap.killTweensOf(compass);
+      context.revert();
     };
   }, []);
 
@@ -66,14 +83,11 @@ function MiniCompass() {
 
     const currentRotation = Number(gsap.getProperty(needle, "rotation")) || 0;
 
-    // Find the shortest route to the new direction.
-    const difference = ((direction - currentRotation + 540) % 360) - 180;
-
-    const targetRotation = currentRotation + difference;
+    const targetRotation = nearestEquivalentAngle(currentRotation, direction);
 
     gsap.to(needle, {
       rotation: targetRotation,
-      duration: 0.35,
+      duration: COMPASS_POINTER_DURATION,
       ease: "power2.out",
       overwrite: "auto",
     });
@@ -111,7 +125,7 @@ function MiniCompass() {
     const currentRotation = Number(gsap.getProperty(needle, "rotation")) || 0;
 
     // Return to North using the nearest equivalent of 0°.
-    const northRotation = Math.round(currentRotation / 360) * 360;
+    const northRotation = nearestEquivalentAngle(currentRotation);
 
     gsap.to(needle, {
       rotation: northRotation,
@@ -134,12 +148,13 @@ function MiniCompass() {
 
     const fullTurn = currentRotation + 360;
 
-    const northRotation = Math.round(fullTurn / 360) * 360;
+    const northRotation = nearestEquivalentAngle(fullTurn);
 
-    gsap
+    spinTimelineRef.current = gsap
       .timeline({
         onComplete: () => {
           isSpinningRef.current = false;
+          spinTimelineRef.current = null;
 
           // Prevent rotation numbers growing forever.
           gsap.set(needle, {
@@ -149,12 +164,12 @@ function MiniCompass() {
       })
       .to(needle, {
         rotation: fullTurn,
-        duration: 0.8,
+        duration: COMPASS_SPIN_DURATION,
         ease: "power2.inOut",
       })
       .to(needle, {
         rotation: northRotation,
-        duration: 0.5,
+        duration: COMPASS_SETTLE_DURATION,
         ease: "back.out(1.7)",
       });
   };
