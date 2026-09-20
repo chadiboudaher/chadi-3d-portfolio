@@ -4,7 +4,8 @@ import { gsap } from "gsap";
 
 const MODEL_PATH = "/models/portfolio.glb";
 const SATELLITE_ROTATION_AXIS = "y";
-const SATELLITE_ROTATION_DURATION = 12;
+const SATELLITE_SCAN_RANGE = Math.PI / 4;
+const SATELLITE_SCAN_DURATION = 6;
 const HOVER_SCALE = 1.15;
 const HOVER_TWEEN = {
   duration: 0.25,
@@ -64,12 +65,19 @@ export default function PortfolioModel({ onLoaded }) {
     if (!satellite) return undefined;
 
     const initialRotation = satellite.rotation[SATELLITE_ROTATION_AXIS];
-    const rotationTween = gsap.to(satellite.rotation, {
-      [SATELLITE_ROTATION_AXIS]: initialRotation + Math.PI * 2,
-      duration: SATELLITE_ROTATION_DURATION,
-      repeat: -1,
-      ease: "none",
-    });
+    const rotationTween = gsap.fromTo(
+      satellite.rotation,
+      {
+        [SATELLITE_ROTATION_AXIS]: initialRotation - SATELLITE_SCAN_RANGE,
+      },
+      {
+        [SATELLITE_ROTATION_AXIS]: initialRotation + SATELLITE_SCAN_RANGE,
+        duration: SATELLITE_SCAN_DURATION,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      },
+    );
 
     return () => {
       rotationTween.kill();
