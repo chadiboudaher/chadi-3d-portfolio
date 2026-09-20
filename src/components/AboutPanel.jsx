@@ -17,10 +17,24 @@ const skillGroups = [
   },
 ];
 
+const personalInterests = [
+  {
+    title: "Chess",
+    description:
+      "I enjoy the strategy, patience, and problem solving behind the game.",
+  },
+  {
+    title: "Reading",
+    description:
+      "Usually something around technology, research, or whatever topic has caught my curiosity.",
+  },
+];
+
 export default function AboutPanel({ onClose }) {
   const overlayRef = useRef(null);
   const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const interestRefs = useRef([]);
   const isClosingRef = useRef(false);
 
   const closePanel = useCallback(() => {
@@ -61,6 +75,16 @@ export default function AboutPanel({ onClose }) {
     return () => context.revert();
   }, [closePanel]);
 
+  useLayoutEffect(() => {
+    const interests = interestRefs.current.filter(Boolean);
+    const context = gsap.context(() => {}, panelRef);
+
+    return () => {
+      gsap.killTweensOf(interests);
+      context.revert();
+    };
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") closePanel();
@@ -72,6 +96,39 @@ export default function AboutPanel({ onClose }) {
 
   const handleBackdropClick = (event) => {
     if (event.target === event.currentTarget) closePanel();
+  };
+  const animateInterest = (target, properties, duration = 0.3) => {
+    gsap.killTweensOf(target);
+    gsap.to(target, {
+      ...properties,
+      duration,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
+  const handleInterestEnter = (event, index) => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches)
+      return;
+
+    animateInterest(event.currentTarget, {
+      y: -4,
+      rotation: index === 0 ? -1.25 : 1.25,
+      scale: 1.03,
+    });
+  };
+
+  const handleInterestLeave = (event) => {
+    animateInterest(event.currentTarget, { y: 0, rotation: 0, scale: 1 });
+  };
+
+  const handleInterestDown = (event) => {
+    if (event.pointerType === "mouse") return;
+    animateInterest(
+      event.currentTarget,
+      { y: 0, rotation: 0, scale: 0.97 },
+      0.2,
+    );
   };
   return (
     <div
@@ -121,6 +178,24 @@ export default function AboutPanel({ onClose }) {
           </section>
 
           <section className="about-panel__section">
+            <div className="about-panel__details">
+              <div className="about-panel__detail">
+                <h2>WHERE ARE YOU BASED?</h2>
+                <p>Lebanon</p>
+              </div>
+              <div className="about-panel__detail">
+                <h2>HOW DO YOU APPROACH YOUR WORK?</h2>
+                <p>
+                  I like to first understand the problem clearly, break it into
+                  smaller pieces, and then experiment until I find an approach
+                  that works. I enjoy learning through building, testing ideas,
+                  and improving them as I go.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="about-panel__section">
             <h2>WHAT I WORK WITH</h2>
             <div className="about-panel__skills">
               {skillGroups.map(({ title, skills }) => (
@@ -138,6 +213,29 @@ export default function AboutPanel({ onClose }) {
               Multimodal AI · Visual Speech Recognition · Computer Vision ·
               Sequence Models · Scalable Backend Systems
             </p>
+          </section>
+
+          <section className="about-panel__section">
+            <h2>A HUMANIZING TOUCH</h2>
+            <div className="about-panel__interests">
+              {personalInterests.map(({ title, description }, index) => (
+                <div
+                  className="about-panel__interest"
+                  key={title}
+                  ref={(element) => {
+                    interestRefs.current[index] = element;
+                  }}
+                  onPointerEnter={(event) => handleInterestEnter(event, index)}
+                  onPointerLeave={handleInterestLeave}
+                  onPointerDown={handleInterestDown}
+                  onPointerUp={handleInterestLeave}
+                  onPointerCancel={handleInterestLeave}
+                >
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                </div>
+              ))}
+            </div>
           </section>
         </div>
       </article>
