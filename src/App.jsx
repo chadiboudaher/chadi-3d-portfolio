@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import LoadingScreen from "./components/LoadingScreen";
 import NavigationHint from "./components/NavigationHint";
+import AboutPanel from "./components/AboutPanel";
 import Experience from "./three/Experience";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
   const [minimumDurationElapsed, setMinimumDurationElapsed] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
   const isReady = assetsLoaded && minimumDurationElapsed;
 
   const handleLoaded = useCallback(() => setAssetsLoaded(true), []);
@@ -18,7 +20,10 @@ function App() {
     setIsEntering(true);
   }, [isEntering, isReady]);
   const handleEntered = useCallback(() => setHasEntered(true), []);
-
+  const handleSectionSelect = useCallback((section) => {
+    setActiveSection(section);
+  }, []);
+  const handleSectionClose = useCallback(() => setActiveSection(null), []);
   useEffect(() => {
     const timeout = window.setTimeout(
       () => setMinimumDurationElapsed(true),
@@ -44,6 +49,11 @@ function App() {
       >
         <Suspense fallback={null}>
           <Experience onLoaded={handleLoaded} controlsEnabled={hasEntered} />
+          <Experience
+            onLoaded={handleLoaded}
+            controlsEnabled={hasEntered && activeSection === null}
+            onSectionSelect={handleSectionSelect}
+          />
         </Suspense>
       </Canvas>
       {!hasEntered && (
@@ -55,6 +65,7 @@ function App() {
         />
       )}
       <NavigationHint visible={hasEntered} />
+      {activeSection === "about" && <AboutPanel onClose={handleSectionClose} />}
     </main>
   );
 }
