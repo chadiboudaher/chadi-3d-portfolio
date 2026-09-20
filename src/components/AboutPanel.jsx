@@ -16,11 +16,28 @@ const skillGroups = [
     skills: "Git · Docker · Linux · FFmpeg",
   },
 ];
-
 function MiniCompass() {
   const compassRef = useRef(null);
   const needleRef = useRef(null);
   const isSpinningRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const needle = needleRef.current;
+
+    if (!needle) return;
+
+    // Important for SVG rotation:
+    // always rotate around the center of the compass.
+    gsap.set(needle, {
+      svgOrigin: "120 120",
+      rotation: 0,
+    });
+
+    return () => {
+      gsap.killTweensOf(needle);
+      gsap.killTweensOf(compassRef.current);
+    };
+  }, []);
 
   const handlePointerMove = (event) => {
     if (
@@ -31,17 +48,32 @@ function MiniCompass() {
       return;
     }
 
-    const bounds = event.currentTarget.getBoundingClientRect();
+    const compass = event.currentTarget;
+    const bounds = compass.getBoundingClientRect();
 
-    const x = event.clientX - (bounds.left + bounds.width / 2);
+    const centerX = bounds.left + bounds.width / 2;
+    const centerY = bounds.top + bounds.height / 2;
 
-    const y = event.clientY - (bounds.top + bounds.height / 2);
+    const x = event.clientX - centerX;
+    const y = event.clientY - centerY;
 
+    // +90 because the needle's default direction points upward.
     const direction = (Math.atan2(y, x) * 180) / Math.PI + 90;
 
-    gsap.to(needleRef.current, {
-      rotation: direction,
-      duration: 0.65,
+    const needle = needleRef.current;
+
+    if (!needle) return;
+
+    const currentRotation = Number(gsap.getProperty(needle, "rotation")) || 0;
+
+    // Find the shortest route to the new direction.
+    const difference = ((direction - currentRotation + 540) % 360) - 180;
+
+    const targetRotation = currentRotation + difference;
+
+    gsap.to(needle, {
+      rotation: targetRotation,
+      duration: 0.35,
       ease: "power2.out",
       overwrite: "auto",
     });
@@ -70,63 +102,62 @@ function MiniCompass() {
       overwrite: "auto",
     });
 
-    if (!isSpinningRef.current) {
-      gsap.to(needleRef.current, {
-        rotation: 0,
-        duration: 0.7,
-        ease: "power2.out",
-        overwrite: "auto",
-      });
-    }
+    if (isSpinningRef.current) return;
+
+    const needle = needleRef.current;
+
+    if (!needle) return;
+
+    const currentRotation = Number(gsap.getProperty(needle, "rotation")) || 0;
+
+    // Return to North using the nearest equivalent of 0°.
+    const northRotation = Math.round(currentRotation / 360) * 360;
+
+    gsap.to(needle, {
+      rotation: northRotation,
+      duration: 0.65,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
   };
 
   const spinNeedle = () => {
     const needle = needleRef.current;
 
-    if (!needle) return;
-
-    const currentRotation = Number(gsap.getProperty(needle, "rotation"));
-
-    const fullTurnRotation = currentRotation + 360;
-
-    const settledRotation = Math.round(fullTurnRotation / 360) * 360;
+    if (!needle || isSpinningRef.current) return;
 
     isSpinningRef.current = true;
 
     gsap.killTweensOf(needle);
 
+    const currentRotation = Number(gsap.getProperty(needle, "rotation")) || 0;
+
+    const fullTurn = currentRotation + 360;
+
+    const northRotation = Math.round(fullTurn / 360) * 360;
+
     gsap
       .timeline({
         onComplete: () => {
           isSpinningRef.current = false;
+
+          // Prevent rotation numbers growing forever.
+          gsap.set(needle, {
+            rotation: 0,
+          });
         },
       })
       .to(needle, {
-        rotation: fullTurnRotation,
+        rotation: fullTurn,
         duration: 0.8,
         ease: "power2.inOut",
       })
       .to(needle, {
-        rotation: settledRotation,
-        duration: 0.65,
+        rotation: northRotation,
+        duration: 0.5,
         ease: "back.out(1.7)",
-      })
-      .set(needle, {
-        rotation: 0,
       });
   };
-
-  useEffect(() => {
-    return () => {
-      if (compassRef.current) {
-        gsap.killTweensOf(compassRef.current);
-      }
-
-      if (needleRef.current) {
-        gsap.killTweensOf(needleRef.current);
-      }
-    };
-  }, []);
 
   return (
     <button
@@ -168,6 +199,7 @@ function MiniCompass() {
           </text>
         </g>
 
+        {/* ONLY the needle rotates */}
         <g className="mini-compass__needle" ref={needleRef}>
           <path className="mini-compass__needle-north" d="M120 66l13 55h-26z" />
 
@@ -175,13 +207,14 @@ function MiniCompass() {
             className="mini-compass__needle-south"
             d="M120 174l-13-53h26z"
           />
-
-          <circle className="mini-compass__pivot" cx="120" cy="120" r="19" />
-
-          <text className="mini-compass__monogram" x="120" y="126">
-            CB
-          </text>
         </g>
+
+        {/* Center stays fixed */}
+        <circle className="mini-compass__pivot" cx="120" cy="120" r="19" />
+
+        <text className="mini-compass__monogram" x="120" y="126">
+          CB
+        </text>
       </svg>
     </button>
   );
