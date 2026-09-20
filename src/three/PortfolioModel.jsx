@@ -3,6 +3,8 @@ import { useGLTF } from "@react-three/drei";
 import { gsap } from "gsap";
 
 const MODEL_PATH = "/models/portfolio.glb";
+const SATELLITE_ROTATION_AXIS = "y";
+const SATELLITE_ROTATION_DURATION = 12;
 const HOVER_SCALE = 1.15;
 const HOVER_TWEEN = {
   duration: 0.25,
@@ -56,6 +58,24 @@ export default function PortfolioModel({ onLoaded }) {
     },
     [animateSign],
   );
+
+  useEffect(() => {
+    const satellite = scene.getObjectByName("satellite_Root");
+    if (!satellite) return undefined;
+
+    const initialRotation = satellite.rotation[SATELLITE_ROTATION_AXIS];
+    const rotationTween = gsap.to(satellite.rotation, {
+      [SATELLITE_ROTATION_AXIS]: initialRotation + Math.PI * 2,
+      duration: SATELLITE_ROTATION_DURATION,
+      repeat: -1,
+      ease: "none",
+    });
+
+    return () => {
+      rotationTween.kill();
+      satellite.rotation[SATELLITE_ROTATION_AXIS] = initialRotation;
+    };
+  }, [scene]);
 
   useEffect(() => {
     const signScales = originalScales.current;
