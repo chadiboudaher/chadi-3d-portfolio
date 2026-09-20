@@ -41,7 +41,7 @@ function MiniCompass() {
 
     const context = gsap.context(() => {
       gsap.set(needle, {
-        svgOrigin: "120 120",
+        transformOrigin: "0px 0px",
         rotation: 0,
       });
     }, compass);
@@ -214,14 +214,13 @@ function MiniCompass() {
           </text>
         </g>
 
-        {/* ONLY the needle rotates */}
-        <g className="mini-compass__needle" ref={needleRef}>
-          <path className="mini-compass__needle-north" d="M120 66l13 55h-26z" />
+        {/* Place the needle at the center; rotate only its local 0,0 group. */}
+        <g transform="translate(120 120)">
+          <g className="mini-compass__needle" ref={needleRef}>
+            <path className="mini-compass__needle-north" d="M0-54 13 1-13 1z" />
 
-          <path
-            className="mini-compass__needle-south"
-            d="M120 174l-13-53h26z"
-          />
+            <path className="mini-compass__needle-south" d="M0 54-13-1 13-1z" />
+          </g>
         </g>
 
         {/* Center stays fixed */}

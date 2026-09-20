@@ -209,7 +209,7 @@ canvas {
 }
 
 .mini-compass__needle {
-  transform-box: fill-box;
+  transform-origin: 0 0;
 }
 
 .mini-compass__needle-north {
