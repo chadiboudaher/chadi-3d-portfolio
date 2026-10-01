@@ -4,8 +4,10 @@ import { MathUtils } from "three";
 
 const TARGET = [2, 2.2, -3];
 const DESKTOP_POSITION = [27, 5.4, -4];
-const MOBILE_POSITION = [47, 12, -6];
-const MAX_DISTANCE = 60;
+// Keep the portrait view near its original visual distance, with a subtle
+// rightward offset for the narrower composition.
+const MOBILE_POSITION = [35, 6, -10];
+const MAX_DISTANCE = 40;
 const MAX_POLAR_ANGLE = MathUtils.degToRad(85);
 
 export default function CameraRig({ controlsEnabled }) {
@@ -35,8 +37,8 @@ export default function CameraRig({ controlsEnabled }) {
         dampingFactor={0.065}
         enablePan={false}
         minDistance={7}
-        // The mobile composition begins about 46 units from TARGET. A limit of
-        // 30 made OrbitControls pull it forward on its first enabled frame.
+        // Both initial compositions are within this limit, so the first
+        // controls update preserves the camera position when Enter completes.
         maxDistance={MAX_DISTANCE}
         minPolarAngle={MathUtils.degToRad(28)}
         // The desktop composition starts around 83 degrees. Keep it inside the
