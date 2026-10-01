@@ -4,6 +4,7 @@ import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import LoadingScreen from "./components/LoadingScreen";
 import NavigationHint from "./components/NavigationHint";
 import AboutPanel from "./components/AboutPanel";
+import ContactPanel from "./components/ContactPanel";
 import Experience from "./three/Experience";
 
 function App() {
@@ -65,6 +66,10 @@ function App() {
       )}
       <NavigationHint visible={hasEntered} />
       {activeSection === "about" && <AboutPanel onClose={handleSectionClose} />}
+
+      {activeSection === "contact" && (
+        <ContactPanel onClose={handleSectionClose} />
+      )}
     </main>
   );
 }

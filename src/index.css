@@ -447,3 +447,194 @@ canvas {
     transition-duration: 1ms;
   }
 }
+
+/* Compact contact card, styled to belong to the campsite palette. */
+.contact-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  background: rgb(69 53 32 / 24%);
+  backdrop-filter: blur(3px);
+}
+
+.contact-card {
+  position: relative;
+  width: min(36rem, 100%);
+  padding: clamp(2.4rem, 7vw, 3.6rem) clamp(1.25rem, 6vw, 3rem)
+    clamp(2rem, 6vw, 3rem);
+  border: 2px solid rgb(255 255 255 / 60%);
+  border-radius: 1.75rem;
+  background: #fff7df;
+  box-shadow:
+    0 0.75rem 0 rgb(135 76 42 / 18%),
+    0 1.8rem 4rem rgb(69 53 32 / 28%);
+  text-align: center;
+}
+
+.contact-card__close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #d96a3a;
+  box-shadow: 0 0.24rem 0 #a94e32;
+  color: #fff7df;
+  font:
+    700 1.8rem/1 system-ui,
+    sans-serif;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.contact-card__close:hover {
+  transform: translateY(-2px) rotate(4deg);
+  box-shadow: 0 0.36rem 0 #a94e32;
+}
+
+.contact-card__close:focus-visible,
+.contact-card__link:focus-visible {
+  outline: 3px solid rgb(169 78 50 / 40%);
+  outline-offset: 4px;
+}
+
+.contact-card__heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.55rem, 2.5vw, 1rem);
+  color: #a94e32;
+}
+
+.contact-card__heading h1 {
+  font-family: "Chewy", system-ui;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 400;
+  letter-spacing: 0.025em;
+  line-height: 1;
+}
+
+.contact-card__spark {
+  color: #d9854f;
+  font-size: clamp(1rem, 4vw, 1.4rem);
+  transform: rotate(-12deg);
+}
+
+.contact-card__spark:last-child {
+  transform: rotate(18deg) scale(0.8);
+}
+
+.contact-card__message {
+  max-width: 27rem;
+  margin: 1rem auto 0;
+  color: #5e4a35;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  line-height: 1.6;
+}
+
+.contact-card__links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.6rem, 2.5vw, 1rem);
+  margin-top: clamp(1.6rem, 5vw, 2.25rem);
+}
+
+.contact-card__link {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.7rem 0.35rem 0.55rem;
+  border-radius: 1.15rem;
+  color: #70462c;
+  text-decoration: none;
+  transform: rotate(calc((var(--link-index) - 1) * 2deg));
+  transition:
+    background-color 220ms ease,
+    transform 220ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.contact-card__link:hover {
+  background: rgb(217 133 79 / 10%);
+  transform: translateY(-4px) rotate(calc((var(--link-index) - 1) * -3deg))
+    scale(1.04);
+}
+
+.contact-card__icon {
+  display: grid;
+  width: clamp(4.2rem, 14vw, 5.7rem);
+  height: clamp(4.2rem, 14vw, 5.7rem);
+  place-items: center;
+  border: 2px solid #d9854f;
+  border-radius: 1.35rem;
+  background: #f8df9d;
+  box-shadow: 0 0.35rem 0 rgb(169 78 50 / 18%);
+  color: #d96a3a;
+  transition:
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.contact-card__link:hover .contact-card__icon {
+  box-shadow: 0 0.5rem 0 rgb(169 78 50 / 20%);
+  transform: scale(1.03);
+}
+
+.contact-card__icon svg {
+  width: 57%;
+  height: 57%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.contact-card__icon--filled svg {
+  fill: currentColor;
+  stroke: none;
+}
+
+.contact-card__link strong {
+  margin-top: 0.8rem;
+  font-size: clamp(0.82rem, 3vw, 0.95rem);
+}
+
+.contact-card__link > span:last-child {
+  margin-top: 0.15rem;
+  color: #8b6b48;
+  font-size: clamp(0.68rem, 2.4vw, 0.78rem);
+}
+
+@media (max-width: 520px) {
+  .contact-overlay {
+    align-items: end;
+    padding: 0.75rem;
+  }
+
+  .contact-card {
+    border-radius: 1.5rem;
+  }
+
+  .contact-card__links {
+    gap: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-card__close,
+  .contact-card__link,
+  .contact-card__icon {
+    transition-duration: 1ms;
+  }
+}

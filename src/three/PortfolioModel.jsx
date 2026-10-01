@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { gsap } from "gsap";
-import { findHoverRoot, isAboutObject, isHoverObject } from "./interaction.js";
+import {
+  findHoverRoot,
+  isAboutObject,
+  isContactObject,
+  isHoverObject,
+} from "./interaction.js";
 
 const MODEL_PATH = "/models/portfolio.glb";
 const SATELLITE_ROTATION_AXIS = "y";
@@ -135,11 +140,19 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
   const handleClick = useCallback(
     (event) => {
       const sign = findHoverRoot(event.object);
-      if (!sign || !isAboutObject(sign)) return;
+      if (!sign) return;
+
+      const section = isAboutObject(sign)
+        ? "about"
+        : isContactObject(sign)
+          ? "contact"
+          : null;
+
+      if (!section) return;
 
       event.stopPropagation();
       resetHoveredSign();
-      onSectionSelect("about");
+      onSectionSelect(section);
     },
     [onSectionSelect, resetHoveredSign],
   );

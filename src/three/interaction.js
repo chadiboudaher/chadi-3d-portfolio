@@ -6,6 +6,10 @@ export function isAboutObject(object) {
   return object.name.toLowerCase().includes("about");
 }
 
+export function isContactObject(object) {
+  return object.name.toLowerCase().includes("contact");
+}
+
 export function findHoverRoot(object) {
   let currentObject = object;
 
