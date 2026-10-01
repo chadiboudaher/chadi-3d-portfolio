@@ -5,6 +5,8 @@ import { MathUtils } from "three";
 const TARGET = [2, 2.2, -3];
 const DESKTOP_POSITION = [27, 5.4, -4];
 const MOBILE_POSITION = [47, 12, -6];
+const MAX_DISTANCE = 60;
+const MAX_POLAR_ANGLE = MathUtils.degToRad(85);
 
 export default function CameraRig({ controlsEnabled }) {
   const width = useThree((state) => state.size.width);
@@ -23,15 +25,23 @@ export default function CameraRig({ controlsEnabled }) {
       />
       <OrbitControls
         makeDefault
-        enabled={controlsEnabled}
+        // Keep update() running behind the intro so the camera is already
+        // oriented toward TARGET before the overlay reveals it. Disabling the
+        // controls themselves used to defer that first update until Enter.
+        enableRotate={controlsEnabled}
+        enableZoom={controlsEnabled}
         target={TARGET}
         enableDamping
         dampingFactor={0.065}
         enablePan={false}
         minDistance={7}
-        maxDistance={30}
+        // The mobile composition begins about 46 units from TARGET. A limit of
+        // 30 made OrbitControls pull it forward on its first enabled frame.
+        maxDistance={MAX_DISTANCE}
         minPolarAngle={MathUtils.degToRad(28)}
-        maxPolarAngle={MathUtils.degToRad(78)}
+        // The desktop composition starts around 83 degrees. Keep it inside the
+        // interaction limits so the first update does not raise the camera.
+        maxPolarAngle={MAX_POLAR_ANGLE}
         minAzimuthAngle={MathUtils.degToRad(19)}
         maxAzimuthAngle={MathUtils.degToRad(190)}
         rotateSpeed={0.65}
