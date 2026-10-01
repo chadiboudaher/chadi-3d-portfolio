@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { gsap } from "gsap";
+import { Color } from "three";
 import {
   findHoverRoot,
+  getInteractionLabel,
   isAboutObject,
   isContactObject,
   isHoverObject,
@@ -12,56 +14,65 @@ const MODEL_PATH = "/models/portfolio.glb";
 const SATELLITE_ROTATION_AXIS = "y";
 const SATELLITE_SCAN_RANGE = Math.PI / 4;
 const SATELLITE_SCAN_DURATION = 6;
-const HOVER_SCALE = 1.15;
-const HOVER_TWEEN = {
-  duration: 0.25,
-  ease: "power2.out",
-  overwrite: true,
-};
+const HIGHLIGHT_COLOR = new Color("#fff4d6");
+const HIGHLIGHT_AMOUNT = 0.08;
 
-export default function PortfolioModel({ onLoaded, onSectionSelect }) {
+export default function PortfolioModel({
+  onLoaded,
+  onSectionSelect,
+  onSceneHover,
+}) {
   const { scene } = useGLTF(MODEL_PATH);
   const hoveredSign = useRef(null);
-  const originalScales = useRef(new Map());
+  const hoverMaterials = useRef(new Map());
+  const supportsHover = useRef(
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches,
+  );
 
-  const animateSign = useCallback((sign, multiplier) => {
-    const originalScale = originalScales.current.get(sign);
-    if (!originalScale) return;
-
-    gsap.killTweensOf(sign.scale);
-    gsap.to(sign.scale, {
-      x: originalScale.x * multiplier,
-      y: originalScale.y * multiplier,
-      z: originalScale.z * multiplier,
-      ...HOVER_TWEEN,
+  const setHighlight = useCallback((sign, highlighted) => {
+    const materials = hoverMaterials.current.get(sign);
+    materials?.forEach(({ material, color, emissive, emissiveIntensity }) => {
+      if (color) {
+        material.color.copy(color);
+        if (highlighted) material.color.lerp(HIGHLIGHT_COLOR, HIGHLIGHT_AMOUNT);
+      }
+      if (emissive) {
+        material.emissive.copy(emissive);
+        if (highlighted) {
+          material.emissive.lerp(HIGHLIGHT_COLOR, HIGHLIGHT_AMOUNT * 0.7);
+        }
+      }
+      if (emissiveIntensity !== undefined) {
+        material.emissiveIntensity = highlighted
+          ? emissiveIntensity + 0.04
+          : emissiveIntensity;
+      }
+      material.needsUpdate = true;
     });
   }, []);
 
   const resetHoveredSign = useCallback(() => {
     const sign = hoveredSign.current;
 
-    if (sign) {
-      const originalScale = originalScales.current.get(sign);
-      gsap.killTweensOf(sign.scale);
-      if (originalScale) sign.scale.copy(originalScale);
-    }
+    if (sign) setHighlight(sign, false);
 
     hoveredSign.current = null;
     document.body.style.cursor = "default";
-  }, []);
+    onSceneHover(null);
+  }, [onSceneHover, setHighlight]);
 
   const setHoveredSign = useCallback(
     (nextSign) => {
       if (hoveredSign.current === nextSign) return;
 
-      if (hoveredSign.current) animateSign(hoveredSign.current, 1);
+      if (hoveredSign.current) setHighlight(hoveredSign.current, false);
 
       hoveredSign.current = nextSign;
       document.body.style.cursor = nextSign ? "pointer" : "default";
 
-      if (nextSign) animateSign(nextSign, HOVER_SCALE);
+      if (nextSign) setHighlight(nextSign, true);
     },
-    [animateSign],
+    [setHighlight],
   );
 
   useEffect(() => {
@@ -90,10 +101,34 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
   }, [scene]);
 
   useEffect(() => {
-    const signScales = originalScales.current;
+    const materialGroups = hoverMaterials.current;
     scene.traverse((object) => {
       if (isHoverObject(object)) {
-        signScales.set(object, object.scale.clone());
+        const materials = [];
+        object.traverse((child) => {
+          if (!child.isMesh || !child.material) return;
+
+          const sourceMaterials = Array.isArray(child.material)
+            ? child.material
+            : [child.material];
+          const clonedMaterials = sourceMaterials.map((material) =>
+            material.clone(),
+          );
+          child.userData.hoverOriginalMaterial = child.material;
+          child.material = Array.isArray(child.material)
+            ? clonedMaterials
+            : clonedMaterials[0];
+
+          clonedMaterials.forEach((material) => {
+            materials.push({
+              material,
+              color: material.color?.clone(),
+              emissive: material.emissive?.clone(),
+              emissiveIntensity: material.emissiveIntensity,
+            });
+          });
+        });
+        materialGroups.set(object, materials);
       }
       if (object.isMesh) {
         object.castShadow = true;
@@ -103,24 +138,31 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
 
     onLoaded();
     return () => {
-      signScales.forEach((originalScale, sign) => {
-        gsap.killTweensOf(sign.scale);
-        sign.scale.copy(originalScale);
+      materialGroups.forEach((materials, sign) => {
+        sign.traverse((child) => {
+          if (!child.userData.hoverOriginalMaterial) return;
+          child.material = child.userData.hoverOriginalMaterial;
+          delete child.userData.hoverOriginalMaterial;
+        });
+        materials.forEach(({ material }) => material.dispose());
       });
-      signScales.clear();
+      materialGroups.clear();
       hoveredSign.current = null;
       document.body.style.cursor = "default";
     };
-  }, [onLoaded, scene]);
+  }, [onLoaded, onSceneHover, scene]);
 
   const handlePointerMove = useCallback(
     (event) => {
+      if (!supportsHover.current) return;
       const sign = findHoverRoot(event.object);
 
       if (sign) event.stopPropagation();
       setHoveredSign(sign);
+      const label = sign ? getInteractionLabel(sign) : null;
+      onSceneHover(label, event.clientX, event.clientY);
     },
-    [setHoveredSign],
+    [onSceneHover, setHoveredSign],
   );
 
   const handlePointerOut = useCallback(
@@ -132,9 +174,12 @@ export default function PortfolioModel({ onLoaded, onSectionSelect }) {
         (intersection) => findHoverRoot(intersection.object) === currentSign,
       );
 
-      if (!isStillOverCurrentSign) setHoveredSign(null);
+      if (!isStillOverCurrentSign) {
+        setHoveredSign(null);
+        onSceneHover(null);
+      }
     },
-    [setHoveredSign],
+    [onSceneHover, setHoveredSign],
   );
 
   const handleClick = useCallback(

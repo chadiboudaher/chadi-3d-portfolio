@@ -9,6 +9,7 @@ function Experience({
   onPrepared,
   controlsEnabled,
   onSectionSelect,
+  onSceneHover,
   resetCameraToken,
 }) {
   return (
@@ -16,7 +17,11 @@ function Experience({
       <color attach="background" args={["#ffe29a"]} />
       <fog attach="fog" args={["#ffe29a", 24, 55]} />
       <Lighting />
-      <PortfolioModel onLoaded={onLoaded} onSectionSelect={onSectionSelect} />
+      <PortfolioModel
+        onLoaded={onLoaded}
+        onSectionSelect={onSectionSelect}
+        onSceneHover={onSceneHover}
+      />
       <CameraRig
         controlsEnabled={controlsEnabled}
         resetCameraToken={resetCameraToken}

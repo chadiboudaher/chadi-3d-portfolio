@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 
@@ -22,6 +22,9 @@ function App() {
 
   const [activeSection, setActiveSection] = useState(null);
   const [resetCameraToken, setResetCameraToken] = useState(0);
+
+  const hoverLabelRef = useRef(null);
+  const currentHoverLabel = useRef(null);
 
   const { isMuted, start: startAmbience, toggleMuted } = useAmbientAudio();
 
@@ -58,6 +61,25 @@ function App() {
     setResetCameraToken((token) => token + 1);
   }, []);
 
+  const handleSceneHover = useCallback((label, x, y) => {
+    const element = hoverLabelRef.current;
+    if (!element) return;
+
+    if (!label) {
+      currentHoverLabel.current = null;
+      element.classList.remove("scene-hover-label--visible");
+      return;
+    }
+
+    if (currentHoverLabel.current !== label) {
+      currentHoverLabel.current = label;
+      element.textContent = `[ ${label} ]`;
+    }
+
+    element.style.transform = `translate3d(${x + 14}px, ${y + 16}px, 0)`;
+    element.classList.add("scene-hover-label--visible");
+  }, []);
+
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       setMinimumDurationElapsed(true);
@@ -91,12 +113,17 @@ function App() {
             onLoaded={handleLoaded}
             onPrepared={handleScenePrepared}
             controlsEnabled={hasEntered && activeSection === null}
+            onSceneHover={handleSceneHover}
             onSectionSelect={handleSectionSelect}
             resetCameraToken={resetCameraToken}
           />
         </Suspense>
       </Canvas>
-
+      <div
+        ref={hoverLabelRef}
+        className="scene-hover-label"
+        aria-hidden="true"
+      />
       {!hasEntered && (
         <LoadingScreen
           isReady={isReady}

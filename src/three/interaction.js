@@ -10,6 +10,16 @@ export function isContactObject(object) {
   return object.name.toLowerCase().includes("contact");
 }
 
+export function getInteractionLabel(object) {
+  const name = object.name.toLowerCase();
+
+  if (name.includes("about")) return "About";
+  if (name.includes("project")) return "Projects";
+  if (name.includes("contact")) return "Contact";
+
+  return null;
+}
+
 export function findHoverRoot(object) {
   let currentObject = object;
 

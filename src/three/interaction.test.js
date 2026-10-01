@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   findHoverRoot,
+  getInteractionLabel,
   isAboutObject,
   isContactObject,
   isHoverObject,
@@ -12,6 +13,13 @@ test("recognizes the exported About sign name", () => {
 
   assert.equal(isHoverObject(aboutSign), true);
   assert.equal(isAboutObject(aboutSign), true);
+});
+
+test("maps interactive roots to their understated label", () => {
+  assert.equal(getInteractionLabel({ name: "sign_about_hover" }), "About");
+  assert.equal(getInteractionLabel({ name: "projects_hover" }), "Projects");
+  assert.equal(getInteractionLabel({ name: "sign_contact_hover" }), "Contact");
+  assert.equal(getInteractionLabel({ name: "decorative_hover" }), null);
 });
 
 test("resolves a raycasted child to the nearest hover ancestor", () => {
