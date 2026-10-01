@@ -2,11 +2,11 @@ import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { MathUtils } from "three";
 
-const TARGET = [2, 2.2, -3];
-const DESKTOP_POSITION = [27, 5.4, -4];
+const TARGET = [2, 2.2, -4.7];
+const DESKTOP_POSITION = [27, 7, -8];
 // Keep the portrait view near its original visual distance, with a subtle
 // rightward offset for the narrower composition.
-const MOBILE_POSITION = [35, 6, -10];
+const MOBILE_POSITION = [40, 6, -10];
 const MAX_DISTANCE = 40;
 const MAX_POLAR_ANGLE = MathUtils.degToRad(85);
 
