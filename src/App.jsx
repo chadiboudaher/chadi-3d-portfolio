@@ -5,6 +5,8 @@ import LoadingScreen from "./components/LoadingScreen";
 import NavigationHint from "./components/NavigationHint";
 import AboutPanel from "./components/AboutPanel";
 import ContactPanel from "./components/ContactPanel";
+import SoundToggle from "./components/SoundToggle";
+import useAmbientAudio from "./audio/useAmbientAudio";
 import Experience from "./three/Experience";
 
 function App() {
@@ -14,14 +16,16 @@ function App() {
   const [isEntering, setIsEntering] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
+  const { isMuted, start: startAmbience, toggleMuted } = useAmbientAudio();
   const isReady = assetsLoaded && scenePrepared && minimumDurationElapsed;
 
   const handleLoaded = useCallback(() => setAssetsLoaded(true), []);
   const handleScenePrepared = useCallback(() => setScenePrepared(true), []);
   const handleEnter = useCallback(() => {
     if (!isReady || isEntering) return;
+    startAmbience();
     setIsEntering(true);
-  }, [isEntering, isReady]);
+  }, [isEntering, isReady, startAmbience]);
   const handleEntered = useCallback(() => setHasEntered(true), []);
   const handleSectionSelect = useCallback((section) => {
     setActiveSection(section);
@@ -68,6 +72,7 @@ function App() {
         />
       )}
       <NavigationHint visible={hasEntered} />
+      {hasEntered && <SoundToggle isMuted={isMuted} onToggle={toggleMuted} />}
       {activeSection === "about" && <AboutPanel onClose={handleSectionClose} />}
 
       {activeSection === "contact" && (

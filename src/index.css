@@ -509,6 +509,51 @@ canvas {
   background: currentColor;
 }
 
+.sound-toggle {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 9;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 2px solid rgb(255 244 214 / 65%);
+  border-radius: 50%;
+  background: #d96a3a;
+  box-shadow: 0 0.25rem 0 #a94e32;
+  color: #fff4d6;
+  cursor: pointer;
+  transition: transform 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.sound-toggle svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.sound-toggle:hover {
+  transform: translateY(-2px);
+}
+
+.sound-toggle:focus-visible {
+  outline: 3px solid rgb(169 78 50 / 40%);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-toggle {
+    transition-duration: 1ms;
+  }
+}
+
 @keyframes hint-in {
   from {
     opacity: 0;
