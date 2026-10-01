@@ -17,7 +17,11 @@ export default function CameraRig({ controlsEnabled, resetCameraToken }) {
   const isMobile = width < 700 || width / height < 0.85;
   const controlsRef = useRef(null);
   const resetRef = useRef(null);
+  const isMobileRef = useRef(isMobile);
 
+  useEffect(() => {
+    isMobileRef.current = isMobile;
+  }, [isMobile]);
   useEffect(() => {
     if (!resetCameraToken || !controlsRef.current) return;
 
@@ -27,11 +31,11 @@ export default function CameraRig({ controlsEnabled, resetCameraToken }) {
       fromPosition: controls.object.position.clone(),
       fromTarget: controls.target.clone(),
       toPosition: new Vector3(
-        ...(isMobile ? MOBILE_POSITION : DESKTOP_POSITION),
+        ...(isMobileRef.current ? MOBILE_POSITION : DESKTOP_POSITION),
       ),
       toTarget: new Vector3(...TARGET),
     };
-  }, [isMobile, resetCameraToken]);
+  }, [resetCameraToken]);
 
   useFrame((_, delta) => {
     const reset = resetRef.current;
