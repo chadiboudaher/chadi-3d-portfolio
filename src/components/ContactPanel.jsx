@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import gsap from "gsap";
 
 const contactLinks = [
   {
@@ -29,13 +30,56 @@ const contactLinks = [
 ];
 
 export default function ContactPanel({ onClose }) {
+  const overlayRef = useRef(null);
+  const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const isClosingRef = useRef(false);
 
-  const closePanel = useCallback(() => onClose(), [onClose]);
+  const closePanel = useCallback(() => {
+    if (isClosingRef.current) return;
+
+    isClosingRef.current = true;
+
+    gsap
+      .timeline({ onComplete: onClose })
+      .to(panelRef.current, {
+        y: 12,
+        scale: 0.98,
+        opacity: 0,
+        duration: 0.26,
+        ease: "power2.in",
+      })
+      .to(
+        overlayRef.current,
+        {
+          autoAlpha: 0,
+          duration: 0.2,
+          ease: "power1.in",
+        },
+        "-=0.16",
+      );
+  }, [onClose]);
+
+  useLayoutEffect(() => {
+    const context = gsap.context(() => {
+      gsap.fromTo(
+        overlayRef.current,
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 0.32, ease: "power1.out" },
+      );
+
+      gsap.fromTo(
+        panelRef.current,
+        { y: 18, scale: 0.98 },
+        { y: 0, scale: 1, duration: 0.42, ease: "power2.out" },
+      );
+    }, overlayRef);
+
+    closeButtonRef.current?.focus();
+    return () => context.revert();
+  }, []);
 
   useEffect(() => {
-    closeButtonRef.current?.focus();
-
     const handleKeyDown = (event) => {
       if (event.key === "Escape") closePanel();
     };
@@ -47,6 +91,7 @@ export default function ContactPanel({ onClose }) {
   return (
     <div
       className="contact-overlay"
+      ref={overlayRef}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) closePanel();
       }}
@@ -54,6 +99,7 @@ export default function ContactPanel({ onClose }) {
     >
       <section
         className="contact-panel"
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="contact-title"
@@ -69,6 +115,10 @@ export default function ContactPanel({ onClose }) {
         </button>
 
         <h1 id="contact-title">CONTACT</h1>
+
+        <p className="contact-panel__message">
+          Let&rsquo;s build something interesting together.
+        </p>
 
         <nav className="contact-links" aria-label="Contact links">
           {contactLinks.map(({ label, href, icon }) => (

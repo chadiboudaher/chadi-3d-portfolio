@@ -72,7 +72,7 @@ canvas {
 }
 
 .contact-panel h1 {
-  margin-bottom: 2rem;
+  margin-bottom: 0.85rem;
   color: #a94e32;
   font-family: "Chewy", system-ui;
   font-size: clamp(2rem, 6vw, 2.8rem);
@@ -81,28 +81,17 @@ canvas {
   line-height: 1;
 }
 
-.contact-panel__close {
-  position: absolute;
-  top: 0.9rem;
-  right: 0.9rem;
-  display: grid;
-  width: 2.5rem;
-  height: 2.5rem;
-  place-items: center;
-  border: 0;
-  background: transparent;
-  color: #70462c;
-  font:
-    400 1.8rem/1 system-ui,
-    sans-serif;
-  cursor: pointer;
-  transition: transform 180ms ease;
+.contact-panel__message {
+  color: #5e4a35;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  line-height: 1.6;
 }
 
 .contact-links {
   display: flex;
   justify-content: center;
   gap: clamp(2rem, 8vw, 3.5rem);
+  margin-top: 1.8rem;
 }
 
 .contact-link {
@@ -129,12 +118,7 @@ canvas {
   transform: translateY(-3px) scale(1.03);
 }
 
-.contact-panel__close:hover {
-  transform: scale(1.06);
-}
-
-.contact-link:focus-visible,
-.contact-panel__close:focus-visible {
+.contact-link:focus-visible {
   outline: 3px solid rgb(169 78 50 / 40%);
   outline-offset: 4px;
   border-radius: 0.3rem;
@@ -172,7 +156,8 @@ canvas {
   scrollbar-width: thin;
 }
 
-.about-panel__close {
+.about-panel__close,
+.contact-panel__close {
   position: absolute;
   top: 0.9rem;
   right: 0.9rem;
@@ -195,12 +180,14 @@ canvas {
     box-shadow 180ms ease;
 }
 
-.about-panel__close:hover {
+.about-panel__close:hover,
+.contact-panel__close:hover {
   transform: translateY(-2px) rotate(4deg);
   box-shadow: 0 0.36rem 0 #a94e32;
 }
 
 .about-panel__close:focus-visible,
+.contact-panel__close:focus-visible,
 .mini-compass:focus-visible {
   outline: 3px solid rgb(169 78 50 / 40%);
   outline-offset: 3px;
