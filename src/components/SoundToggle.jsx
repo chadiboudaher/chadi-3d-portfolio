@@ -3,7 +3,7 @@ export default function SoundToggle({ isMuted, onToggle }) {
 
   return (
     <button
-      className="sound-toggle"
+      className="scene-control"
       type="button"
       onClick={onToggle}
       aria-label={label}

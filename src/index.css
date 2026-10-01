@@ -493,89 +493,6 @@ canvas {
   animation: interface-in 650ms 180ms both ease-out;
 }
 
-.scene-interface__utilities {
-  position: absolute;
-  top: max(1rem, env(safe-area-inset-top));
-  left: max(1rem, env(safe-area-inset-left));
-  display: flex;
-  gap: 0.4rem;
-  padding: 0.25rem;
-  border-radius: 0.85rem;
-  background: rgb(255 247 223 / 68%);
-  backdrop-filter: blur(4px);
-  pointer-events: auto;
-}
-
-.scene-interface__control {
-  display: grid;
-  width: 2.35rem;
-  height: 2.35rem;
-  place-items: center;
-  border: 0;
-  border-radius: 0.65rem;
-  background: transparent;
-  color: #70462c;
-  cursor: pointer;
-  transition:
-    color 180ms ease,
-    transform 180ms ease,
-    background-color 180ms ease;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.scene-interface__control svg {
-  width: 1.2rem;
-  height: 1.2rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.7;
-}
-
-.scene-interface__control:hover {
-  background: rgb(217 133 79 / 14%);
-  color: #a94e32;
-  transform: translateY(-2px);
-}
-
-.scene-interface__control:focus-visible,
-.scene-interface__resume:focus-visible {
-  outline: 2px solid rgb(169 78 50 / 55%);
-  outline-offset: 2px;
-}
-
-.scene-interface__resume {
-  position: absolute;
-  top: max(1rem, env(safe-area-inset-top));
-  right: max(1rem, env(safe-area-inset-right));
-  padding: 0.55rem 0.65rem;
-  color: #70462c;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.035em;
-  text-decoration: none;
-  pointer-events: auto;
-  transition:
-    color 180ms ease,
-    transform 180ms ease;
-}
-
-.scene-interface__resume span {
-  display: inline-block;
-  transition: transform 180ms ease;
-}
-
-.scene-interface__resume:hover {
-  color: #a94e32;
-  transform: translateY(-1px);
-}
-
-.scene-interface__resume:hover span {
-  transform: translate(2px, -2px);
-}
-
 .scene-interface__meta {
   position: absolute;
   bottom: max(1rem, env(safe-area-inset-bottom));
@@ -609,21 +526,6 @@ canvas {
 }
 
 @media (max-width: 700px) {
-  .scene-interface__utilities {
-    top: max(0.75rem, env(safe-area-inset-top));
-    left: max(0.75rem, env(safe-area-inset-left));
-  }
-
-  .scene-interface__control {
-    width: 2.65rem;
-    height: 2.65rem;
-  }
-
-  .scene-interface__resume {
-    top: max(0.82rem, env(safe-area-inset-top));
-    right: max(0.75rem, env(safe-area-inset-right));
-  }
-
   .scene-interface__meta {
     right: max(0.75rem, env(safe-area-inset-right));
     bottom: max(0.75rem, env(safe-area-inset-bottom));
@@ -662,11 +564,18 @@ canvas {
   background: currentColor;
 }
 
-.sound-toggle {
-  position: absolute;
-  top: max(1rem, env(safe-area-inset-top));
+.scene-controls {
+  position: fixed;
+  top: 50%;
   right: max(1rem, env(safe-area-inset-right));
   z-index: 9;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transform: translateY(-50%);
+}
+
+.scene-control {
   display: grid;
   width: 2.75rem;
   height: 2.75rem;
@@ -682,7 +591,7 @@ canvas {
   touch-action: manipulation;
 }
 
-.sound-toggle svg {
+.scene-control svg {
   width: 1.35rem;
   height: 1.35rem;
   fill: currentColor;
@@ -692,17 +601,33 @@ canvas {
   stroke-width: 1.8;
 }
 
-.sound-toggle:hover {
+.scene-control:hover {
   transform: translateY(-2px);
 }
 
-.sound-toggle:focus-visible {
+.scene-control:focus-visible {
   outline: 3px solid rgb(169 78 50 / 40%);
   outline-offset: 4px;
 }
 
+.scene-control--line svg {
+  fill: none;
+}
+
+@media (max-width: 700px) {
+  .scene-controls {
+    right: max(0.65rem, env(safe-area-inset-right));
+    gap: 0.65rem;
+  }
+
+  .scene-control {
+    width: 2.65rem;
+    height: 2.65rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .sound-toggle {
+  .scene-control {
     transition-duration: 1ms;
   }
 }

@@ -26,6 +26,9 @@ export default function CameraRig({ controlsEnabled, resetCameraToken }) {
     if (!resetCameraToken || !controlsRef.current) return;
 
     const controls = controlsRef.current;
+    const dampingWasEnabled =
+      resetRef.current?.dampingWasEnabled ?? controls.enableDamping;
+    controls.enableDamping = false;
     resetRef.current = {
       elapsed: 0,
       fromPosition: controls.object.position.clone(),
@@ -34,6 +37,7 @@ export default function CameraRig({ controlsEnabled, resetCameraToken }) {
         ...(isMobileRef.current ? MOBILE_POSITION : DESKTOP_POSITION),
       ),
       toTarget: new Vector3(...TARGET),
+      dampingWasEnabled,
     };
   }, [resetCameraToken]);
 
@@ -53,7 +57,13 @@ export default function CameraRig({ controlsEnabled, resetCameraToken }) {
     controls.target.lerpVectors(reset.fromTarget, reset.toTarget, eased);
     controls.update();
 
-    if (progress === 1) resetRef.current = null;
+    if (progress === 1) {
+      controls.object.position.copy(reset.toPosition);
+      controls.target.copy(reset.toTarget);
+      controls.update();
+      controls.enableDamping = reset.dampingWasEnabled;
+      resetRef.current = null;
+    }
   });
 
   return (

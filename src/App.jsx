@@ -110,9 +110,40 @@ function App() {
 
       {hasEntered && (
         <>
-          <SoundToggle isMuted={isMuted} onToggle={toggleMuted} />
+          <div
+            className="scene-controls"
+            role="group"
+            aria-label="Scene controls"
+          >
+            <SoundToggle isMuted={isMuted} onToggle={toggleMuted} />
+            <button
+              className="scene-control scene-control--line"
+              type="button"
+              onClick={handleCameraReset}
+              aria-label="Reset camera"
+              title="Reset camera"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5.5 8.5V4.8m0 0h3.7m-3.7 0A8 8 0 1 1 4 14" />
+                <path d="M9 14.5 12 12l3 2.5V18H9v-3.5Z" />
+              </svg>
+            </button>
+            <a
+              className="scene-control scene-control--line"
+              href="/resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open resume"
+              title="Resume"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 3.5h6l4 4V20.5H7Z" />
+                <path d="M13 3.5v4h4M10 12h4M10 15.5h4" />
+              </svg>
+            </a>
+          </div>
 
-          <SceneInterface onResetCamera={handleCameraReset} />
+          <SceneInterface />
         </>
       )}
 
