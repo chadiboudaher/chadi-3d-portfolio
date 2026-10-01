@@ -1,6 +1,7 @@
+import { useEffect, useRef } from "react";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
-import { MathUtils } from "three";
+import { useFrame, useThree } from "@react-three/fiber";
+import { MathUtils, Vector3 } from "three";
 
 const TARGET = [2, 2.2, -4.7];
 const DESKTOP_POSITION = [27, 7, -8];
@@ -10,10 +11,46 @@ const MOBILE_POSITION = [40, 6, -10];
 const MAX_DISTANCE = 40;
 const MAX_POLAR_ANGLE = MathUtils.degToRad(85);
 
-export default function CameraRig({ controlsEnabled }) {
+export default function CameraRig({ controlsEnabled, resetCameraToken }) {
   const width = useThree((state) => state.size.width);
   const height = useThree((state) => state.size.height);
   const isMobile = width < 700 || width / height < 0.85;
+  const controlsRef = useRef(null);
+  const resetRef = useRef(null);
+
+  useEffect(() => {
+    if (!resetCameraToken || !controlsRef.current) return;
+
+    const controls = controlsRef.current;
+    resetRef.current = {
+      elapsed: 0,
+      fromPosition: controls.object.position.clone(),
+      fromTarget: controls.target.clone(),
+      toPosition: new Vector3(
+        ...(isMobile ? MOBILE_POSITION : DESKTOP_POSITION),
+      ),
+      toTarget: new Vector3(...TARGET),
+    };
+  }, [isMobile, resetCameraToken]);
+
+  useFrame((_, delta) => {
+    const reset = resetRef.current;
+    const controls = controlsRef.current;
+    if (!reset || !controls) return;
+
+    reset.elapsed = Math.min(reset.elapsed + delta, 1.15);
+    const progress = reset.elapsed / 1.15;
+    const eased = 1 - (1 - progress) ** 3;
+    controls.object.position.lerpVectors(
+      reset.fromPosition,
+      reset.toPosition,
+      eased,
+    );
+    controls.target.lerpVectors(reset.fromTarget, reset.toTarget, eased);
+    controls.update();
+
+    if (progress === 1) resetRef.current = null;
+  });
 
   return (
     <>
@@ -26,6 +63,7 @@ export default function CameraRig({ controlsEnabled }) {
         far={150}
       />
       <OrbitControls
+        ref={controlsRef}
         makeDefault
         // Keep update() running behind the intro so the camera is already
         // oriented toward TARGET before the overlay reveals it. Disabling the

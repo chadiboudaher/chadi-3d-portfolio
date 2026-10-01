@@ -467,23 +467,176 @@ canvas {
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  padding: 0.72rem 1rem;
-  border: 1px solid rgb(255 255 255 / 30%);
-  border-radius: 999px;
-  background: rgb(69 53 32 / 74%);
-  box-shadow: 0 8px 28px rgb(85 53 16 / 16%);
-  color: #fff9e9;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.55rem;
+  background: rgb(255 247 223 / 72%);
+  color: #5e4a35;
   font-size: clamp(0.7rem, 2.8vw, 0.8rem);
   letter-spacing: 0.025em;
   opacity: 1;
   transform: translate(-50%, 0);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   animation: hint-in 700ms 500ms both ease-out;
   transition:
     opacity 700ms ease,
     transform 700ms ease;
   white-space: nowrap;
   pointer-events: none;
+}
+
+.scene-interface {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  color: #5e4a35;
+  pointer-events: none;
+  animation: interface-in 650ms 180ms both ease-out;
+}
+
+.scene-interface__utilities {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  left: max(1rem, env(safe-area-inset-left));
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.25rem;
+  border-radius: 0.85rem;
+  background: rgb(255 247 223 / 68%);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+.scene-interface__control {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 0;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: #70462c;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    transform 180ms ease,
+    background-color 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.scene-interface__control svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.scene-interface__control:hover {
+  background: rgb(217 133 79 / 14%);
+  color: #a94e32;
+  transform: translateY(-2px);
+}
+
+.scene-interface__control:focus-visible,
+.scene-interface__resume:focus-visible {
+  outline: 2px solid rgb(169 78 50 / 55%);
+  outline-offset: 2px;
+}
+
+.scene-interface__resume {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  padding: 0.55rem 0.65rem;
+  color: #70462c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-decoration: none;
+  pointer-events: auto;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.scene-interface__resume span {
+  display: inline-block;
+  transition: transform 180ms ease;
+}
+
+.scene-interface__resume:hover {
+  color: #a94e32;
+  transform: translateY(-1px);
+}
+
+.scene-interface__resume:hover span {
+  transform: translate(2px, -2px);
+}
+
+.scene-interface__meta {
+  position: absolute;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: max(1rem, env(safe-area-inset-left));
+  max-width: min(29rem, calc(100vw - 2rem));
+  text-shadow: 0 1px rgb(255 247 223 / 55%);
+}
+
+.scene-interface__currently {
+  font-size: clamp(0.68rem, 1.4vw, 0.78rem);
+  font-weight: 600;
+  letter-spacing: 0.018em;
+}
+
+.scene-interface__currently span {
+  color: #a94e32;
+}
+
+.scene-interface__credit {
+  margin-top: 0.3rem;
+  color: #8b6b48;
+  font-size: clamp(0.58rem, 1.2vw, 0.68rem);
+  letter-spacing: 0.02em;
+}
+
+@keyframes interface-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (max-width: 700px) {
+  .scene-interface__utilities {
+    top: max(0.75rem, env(safe-area-inset-top));
+    left: max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .scene-interface__control {
+    width: 2.65rem;
+    height: 2.65rem;
+  }
+
+  .scene-interface__resume {
+    top: max(0.82rem, env(safe-area-inset-top));
+    right: max(0.75rem, env(safe-area-inset-right));
+  }
+
+  .scene-interface__meta {
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    left: max(0.75rem, env(safe-area-inset-left));
+    text-align: center;
+  }
+
+  .navigation-hint {
+    bottom: max(4.5rem, calc(env(safe-area-inset-bottom) + 3.75rem));
+    max-width: calc(100vw - 1.5rem);
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .navigation-hint--hidden {

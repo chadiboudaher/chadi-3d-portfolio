@@ -1,11 +1,14 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
+
 import LoadingScreen from "./components/LoadingScreen";
 import NavigationHint from "./components/NavigationHint";
+import SceneInterface from "./components/SceneInterface";
 import AboutPanel from "./components/AboutPanel";
 import ContactPanel from "./components/ContactPanel";
 import SoundToggle from "./components/SoundToggle";
+
 import useAmbientAudio from "./audio/useAmbientAudio";
 import Experience from "./three/Experience";
 
@@ -13,29 +16,53 @@ function App() {
   const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [scenePrepared, setScenePrepared] = useState(false);
   const [minimumDurationElapsed, setMinimumDurationElapsed] = useState(false);
+
   const [isEntering, setIsEntering] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
+
   const [activeSection, setActiveSection] = useState(null);
+  const [resetCameraToken, setResetCameraToken] = useState(0);
+
   const { isMuted, start: startAmbience, toggleMuted } = useAmbientAudio();
+
   const isReady = assetsLoaded && scenePrepared && minimumDurationElapsed;
 
-  const handleLoaded = useCallback(() => setAssetsLoaded(true), []);
-  const handleScenePrepared = useCallback(() => setScenePrepared(true), []);
+  const handleLoaded = useCallback(() => {
+    setAssetsLoaded(true);
+  }, []);
+
+  const handleScenePrepared = useCallback(() => {
+    setScenePrepared(true);
+  }, []);
+
   const handleEnter = useCallback(() => {
     if (!isReady || isEntering) return;
+
     startAmbience();
     setIsEntering(true);
   }, [isEntering, isReady, startAmbience]);
-  const handleEntered = useCallback(() => setHasEntered(true), []);
+
+  const handleEntered = useCallback(() => {
+    setHasEntered(true);
+  }, []);
+
   const handleSectionSelect = useCallback((section) => {
     setActiveSection(section);
   }, []);
-  const handleSectionClose = useCallback(() => setActiveSection(null), []);
+
+  const handleSectionClose = useCallback(() => {
+    setActiveSection(null);
+  }, []);
+
+  const handleCameraReset = useCallback(() => {
+    setResetCameraToken((token) => token + 1);
+  }, []);
+
   useEffect(() => {
-    const timeout = window.setTimeout(
-      () => setMinimumDurationElapsed(true),
-      2800,
-    );
+    const timeout = window.setTimeout(() => {
+      setMinimumDurationElapsed(true);
+    }, 2800);
+
     return () => window.clearTimeout(timeout);
   }, []);
 
@@ -44,7 +71,12 @@ function App() {
       <Canvas
         dpr={[1, 2]}
         shadows
-        camera={{ position: [9.2, 6.4, 13.2], fov: 40, near: 0.1, far: 150 }}
+        camera={{
+          position: [9.2, 6.4, 13.2],
+          fov: 40,
+          near: 0.1,
+          far: 150,
+        }}
         gl={{
           antialias: true,
           alpha: false,
@@ -60,9 +92,11 @@ function App() {
             onPrepared={handleScenePrepared}
             controlsEnabled={hasEntered && activeSection === null}
             onSectionSelect={handleSectionSelect}
+            resetCameraToken={resetCameraToken}
           />
         </Suspense>
       </Canvas>
+
       {!hasEntered && (
         <LoadingScreen
           isReady={isReady}
@@ -71,8 +105,17 @@ function App() {
           onEntered={handleEntered}
         />
       )}
+
       <NavigationHint visible={hasEntered} />
-      {hasEntered && <SoundToggle isMuted={isMuted} onToggle={toggleMuted} />}
+
+      {hasEntered && (
+        <>
+          <SoundToggle isMuted={isMuted} onToggle={toggleMuted} />
+
+          <SceneInterface onResetCamera={handleCameraReset} />
+        </>
+      )}
+
       {activeSection === "about" && <AboutPanel onClose={handleSectionClose} />}
 
       {activeSection === "contact" && (
