@@ -38,7 +38,8 @@ canvas {
   overflow: hidden;
 }
 
-.about-overlay {
+.about-overlay,
+.contact-overlay {
   position: absolute;
   inset: 0;
   z-index: 8;
@@ -49,7 +50,8 @@ canvas {
   backdrop-filter: blur(3px);
 }
 
-.about-panel {
+.about-panel,
+.contact-panel {
   position: relative;
   width: min(68rem, 100%);
   max-height: min(88vh, 54rem);
@@ -60,6 +62,104 @@ canvas {
   box-shadow:
     0 1rem 0 rgb(135 76 42 / 18%),
     0 1.8rem 4rem rgb(69 53 32 / 28%);
+}
+
+.contact-panel {
+  width: min(32rem, 100%);
+  padding: clamp(2.5rem, 7vw, 3.5rem);
+  color: #70462c;
+  text-align: center;
+}
+
+.contact-panel h1 {
+  margin-bottom: 2rem;
+  color: #a94e32;
+  font-family: "Chewy", system-ui;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  font-weight: 400;
+  letter-spacing: 0.025em;
+  line-height: 1;
+}
+
+.contact-panel__close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #70462c;
+  font:
+    400 1.8rem/1 system-ui,
+    sans-serif;
+  cursor: pointer;
+  transition: transform 180ms ease;
+}
+
+.contact-links {
+  display: flex;
+  justify-content: center;
+  gap: clamp(2rem, 8vw, 3.5rem);
+}
+
+.contact-link {
+  display: grid;
+  gap: 0.65rem;
+  justify-items: center;
+  color: #70462c;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    color 180ms ease;
+}
+
+.contact-link svg {
+  width: clamp(3.25rem, 12vw, 4rem);
+  height: clamp(3.25rem, 12vw, 4rem);
+  fill: currentColor;
+}
+
+.contact-link:hover {
+  color: #a94e32;
+  transform: translateY(-3px) scale(1.03);
+}
+
+.contact-panel__close:hover {
+  transform: scale(1.06);
+}
+
+.contact-link:focus-visible,
+.contact-panel__close:focus-visible {
+  outline: 3px solid rgb(169 78 50 / 40%);
+  outline-offset: 4px;
+  border-radius: 0.3rem;
+}
+
+@media (max-width: 480px) {
+  .contact-panel {
+    padding-inline: 1.5rem;
+  }
+
+  .contact-links {
+    gap: clamp(1.25rem, 7vw, 2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-link,
+  .contact-panel__close {
+    transition-duration: 1ms;
+  }
+}
+
+.about-panel {
+  width: min(68rem, 100%);
+  max-height: min(88vh, 54rem);
 }
 
 .about-panel__scroll {
@@ -318,6 +418,7 @@ canvas {
   place-items: center;
   background: var(--loading-background);
   text-align: center;
+  will-change: opacity;
 }
 
 .loading-screen__loading,
@@ -359,6 +460,7 @@ canvas {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  will-change: transform;
 }
 
 .loading-screen__enter:focus-visible {

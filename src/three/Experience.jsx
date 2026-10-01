@@ -1,9 +1,12 @@
+import { memo } from "react";
 import CameraRig from "./CameraRig";
 import Lighting from "./Lighting";
 import PortfolioModel from "./PortfolioModel";
+import SceneWarmup from "./SceneWarmup";
 
-export default function Experience({
+function Experience({
   onLoaded,
+  onPrepared,
   controlsEnabled,
   onSectionSelect,
 }) {
@@ -14,6 +17,11 @@ export default function Experience({
       <Lighting />
       <PortfolioModel onLoaded={onLoaded} onSectionSelect={onSectionSelect} />
       <CameraRig controlsEnabled={controlsEnabled} />
+      <SceneWarmup onPrepared={onPrepared} />
     </>
   );
 }
+
+// Entering only changes the HTML overlay. Keep that state update from
+// reconciling the complete Three.js scene at the start of the transition.
+export default memo(Experience);

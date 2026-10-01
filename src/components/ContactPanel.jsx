@@ -1,90 +1,45 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
+import { useCallback, useEffect, useRef } from "react";
 
 const contactLinks = [
   {
-    label: "Email",
-    detail: "Say hello",
-    href: "mailto:chadiboudaher7@gmail.com",
-    filled: false,
-    icon: (
-      <>
-        <rect x="4" y="6" width="24" height="20" rx="4" />
-        <path d="m6.5 9 9.5 8 9.5-8" />
-      </>
-    ),
-  },
-  {
     label: "GitHub",
-    detail: "See my work",
     href: "https://github.com/chadiboudaher",
-    filled: true,
     icon: (
-      <path d="M16 3.8a12.4 12.4 0 0 0-3.9 24.2c.6.1.8-.3.8-.6v-2.2c-3.4.7-4.1-1.4-4.1-1.4-.5-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.3.1 2 1.3 2 1.3 1.1 2 3 1.4 3.7 1 .1-.8.4-1.4.8-1.8-2.7-.3-5.6-1.4-5.6-6.1 0-1.4.5-2.5 1.3-3.4-.1-.3-.6-1.6.1-3.4 0 0 1.1-.3 3.5 1.3a12 12 0 0 1 6.4 0c2.4-1.6 3.5-1.3 3.5-1.3.7 1.8.2 3.1.1 3.4.8.9 1.3 2 1.3 3.4 0 4.8-2.9 5.8-5.6 6.1.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12.4 12.4 0 0 0 16 3.8Z" />
+      <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.86c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.84a9.6 9.6 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" />
     ),
   },
   {
     label: "LinkedIn",
-    detail: "Let's connect",
-    href: "https://www.linkedin.com/in/chadi-boudaher/",
-    filled: true,
+    href: "https://www.linkedin.com/in/chadiboudaher1/",
     icon: (
       <>
-        <rect x="5" y="12" width="5" height="15" rx="1" />
-        <circle cx="7.5" cy="7.5" r="2.5" />
-        <path d="M14 27V12h5v2.2c1-1.6 2.6-2.7 5-2.7 3.6 0 5 2.4 5 6.4V27h-5v-8.1c0-2-.7-3.3-2.5-3.3-2 0-2.5 1.5-2.5 3.3V27Z" />
+        <path d="M6.5 8.25H3.25V21H6.5V8.25Z" />
+        <path d="M4.88 3A1.88 1.88 0 1 0 4.87 6.75 1.88 1.88 0 0 0 4.88 3Z" />
+        <path d="M21 13.69c0-3.84-2.05-5.63-4.79-5.63a4.14 4.14 0 0 0-3.74 2.06V8.25H9.22V21h3.25v-6.31c0-1.66.32-3.28 2.39-3.28 2.04 0 2.07 1.91 2.07 3.39V21H21v-7.31Z" />
       </>
+    ),
+  },
+  {
+    label: "Email",
+    href: "mailto:chadiboudaher7@gmail.com",
+    icon: (
+      <path d="M3.75 5h16.5A1.75 1.75 0 0 1 22 6.75v10.5A1.75 1.75 0 0 1 20.25 19H3.75A1.75 1.75 0 0 1 2 17.25V6.75A1.75 1.75 0 0 1 3.75 5Zm.08 2 8.17 6.1L20.17 7H3.83Zm16.17 9.93V9.05l-7.4 5.52a1 1 0 0 1-1.2 0L4 9.05v7.88c0 .04.03.07.07.07h15.86c.04 0 .07-.03.07-.07Z" />
     ),
   },
 ];
 
 export default function ContactPanel({ onClose }) {
-  const overlayRef = useRef(null);
-  const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
-  const isClosingRef = useRef(false);
 
-  const closePanel = useCallback(() => {
-    if (isClosingRef.current) return;
-    isClosingRef.current = true;
-    gsap
-      .timeline({ onComplete: onClose })
-      .to(panelRef.current, {
-        y: 14,
-        rotation: -1,
-        scale: 0.97,
-        opacity: 0,
-        duration: 0.24,
-        ease: "power2.in",
-      })
-      .to(
-        overlayRef.current,
-        { autoAlpha: 0, duration: 0.18, ease: "power1.in" },
-        "-=0.12",
-      );
-  }, [onClose]);
-
-  useLayoutEffect(() => {
-    const context = gsap.context(() => {
-      gsap.fromTo(
-        overlayRef.current,
-        { autoAlpha: 0 },
-        { autoAlpha: 1, duration: 0.3, ease: "power1.out" },
-      );
-      gsap.fromTo(
-        panelRef.current,
-        { y: 22, rotation: 1.5, scale: 0.96 },
-        { y: 0, rotation: 0, scale: 1, duration: 0.46, ease: "back.out(1.35)" },
-      );
-    }, overlayRef);
-    closeButtonRef.current?.focus();
-    return () => context.revert();
-  }, []);
+  const closePanel = useCallback(() => onClose(), [onClose]);
 
   useEffect(() => {
+    closeButtonRef.current?.focus();
+
     const handleKeyDown = (event) => {
       if (event.key === "Escape") closePanel();
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [closePanel]);
@@ -92,64 +47,47 @@ export default function ContactPanel({ onClose }) {
   return (
     <div
       className="contact-overlay"
-      ref={overlayRef}
-      onMouseDown={(event) =>
-        event.target === event.currentTarget && closePanel()
-      }
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) closePanel();
+      }}
       role="presentation"
     >
-      <article
-        className="contact-card"
-        ref={panelRef}
+      <section
+        className="contact-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="contact-title"
-        aria-describedby="contact-description"
       >
         <button
-          className="contact-card__close"
+          className="contact-panel__close"
           ref={closeButtonRef}
           type="button"
           onClick={closePanel}
-          aria-label="Close Contact panel"
+          aria-label="Close Contact section"
         >
           <span aria-hidden="true">×</span>
         </button>
-        <div className="contact-card__heading">
-          <span className="contact-card__spark" aria-hidden="true">
-            ✦
-          </span>
-          <h1 id="contact-title">LET’S CONNECT</h1>
-          <span className="contact-card__spark" aria-hidden="true">
-            ✦
-          </span>
-        </div>
-        <p id="contact-description" className="contact-card__message">
-          Have an idea, a project, or just want to say hello? I’d love to hear
-          from you.
-        </p>
-        <nav className="contact-card__links" aria-label="Contact links">
-          {contactLinks.map(({ label, detail, href, icon, filled }, index) => (
+
+        <h1 id="contact-title">CONTACT</h1>
+
+        <nav className="contact-links" aria-label="Contact links">
+          {contactLinks.map(({ label, href, icon }) => (
             <a
-              className="contact-card__link"
+              className="contact-link"
               href={href}
               key={label}
+              aria-label={label}
               target={href.startsWith("http") ? "_blank" : undefined}
               rel={href.startsWith("http") ? "noreferrer" : undefined}
-              style={{ "--link-index": index }}
             >
-              <span
-                className={`contact-card__icon${filled ? " contact-card__icon--filled" : ""}`}
-                aria-hidden="true"
-              >
-                <svg viewBox="0 0 32 32">{icon}</svg>
-              </span>
-              <strong>{label}</strong>
-              <span>{detail}</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                {icon}
+              </svg>
+              <span>{label}</span>
             </a>
           ))}
         </nav>
-      </article>
+      </section>
     </div>
   );
 }

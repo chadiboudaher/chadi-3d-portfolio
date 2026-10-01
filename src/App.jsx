@@ -9,13 +9,15 @@ import Experience from "./three/Experience";
 
 function App() {
   const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [scenePrepared, setScenePrepared] = useState(false);
   const [minimumDurationElapsed, setMinimumDurationElapsed] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
-  const isReady = assetsLoaded && minimumDurationElapsed;
+  const isReady = assetsLoaded && scenePrepared && minimumDurationElapsed;
 
   const handleLoaded = useCallback(() => setAssetsLoaded(true), []);
+  const handleScenePrepared = useCallback(() => setScenePrepared(true), []);
   const handleEnter = useCallback(() => {
     if (!isReady || isEntering) return;
     setIsEntering(true);
@@ -51,6 +53,7 @@ function App() {
         <Suspense fallback={null}>
           <Experience
             onLoaded={handleLoaded}
+            onPrepared={handleScenePrepared}
             controlsEnabled={hasEntered && activeSection === null}
             onSectionSelect={handleSectionSelect}
           />
