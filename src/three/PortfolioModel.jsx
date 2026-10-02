@@ -11,7 +11,7 @@ import {
   isHoverObject,
 } from "./interaction.js";
 
-const MODEL_PATH = "/models/portfolio.glb";
+const MODEL_PATH = "/models/portfolio-v1.glb";
 const SATELLITE_ROTATION_AXIS = "y";
 const SATELLITE_SCAN_RANGE = Math.PI / 4;
 const SATELLITE_SCAN_DURATION = 6;
