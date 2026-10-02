@@ -1,5 +1,13 @@
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Component,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Canvas } from "@react-three/fiber";
+import { useProgress } from "@react-three/drei";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 
 import LoadingScreen from "./components/LoadingScreen";
@@ -13,10 +21,30 @@ import SoundToggle from "./components/SoundToggle";
 import useAmbientAudio from "./audio/useAmbientAudio";
 import Experience from "./three/Experience";
 
+class SceneErrorBoundary extends Component {
+  state = { error: null };
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  componentDidCatch(error) {
+    this.props.onError(error);
+  }
+
+  render() {
+    if (this.state.error) return null;
+    return this.props.children;
+  }
+}
+
 function App() {
-  const [assetsLoaded, setAssetsLoaded] = useState(false);
-  const [scenePrepared, setScenePrepared] = useState(false);
+  const [modelPrepared, setModelPrepared] = useState(false);
+  const [cameraPrepared, setCameraPrepared] = useState(false);
+  const [firstFrameRendered, setFirstFrameRendered] = useState(false);
+  const [sceneError, setSceneError] = useState(null);
   const [minimumDurationElapsed, setMinimumDurationElapsed] = useState(false);
+  const { active: assetsActive, loaded, total } = useProgress();
 
   const [isEntering, setIsEntering] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
@@ -29,14 +57,32 @@ function App() {
 
   const { isMuted, start: startAmbience, toggleMuted } = useAmbientAudio();
 
-  const isReady = assetsLoaded && scenePrepared && minimumDurationElapsed;
+  // The model callback confirms that its materials have been prepared, while
+  // useProgress makes sure the loader has no outstanding requests. Neither is
+  // sufficient on its own to reveal the scene.
+  const assetsLoaded = modelPrepared && !assetsActive && loaded >= total;
+  const scenePrepared = cameraPrepared && !sceneError;
+  const isReady =
+    assetsLoaded &&
+    scenePrepared &&
+    firstFrameRendered &&
+    minimumDurationElapsed;
 
-  const handleLoaded = useCallback(() => {
-    setAssetsLoaded(true);
+  const handleModelPrepared = useCallback(() => {
+    setModelPrepared(true);
   }, []);
 
-  const handleScenePrepared = useCallback(() => {
-    setScenePrepared(true);
+  const handleCameraPrepared = useCallback(() => {
+    setCameraPrepared(true);
+  }, []);
+
+  const handleFirstFrameRendered = useCallback(() => {
+    setFirstFrameRendered(true);
+  }, []);
+
+  const handleSceneError = useCallback((error) => {
+    console.error("The 3D scene could not be loaded.", error);
+    setSceneError("The 3D scene could not be loaded. Please try again.");
   }, []);
 
   const handleEnter = useCallback(() => {
@@ -91,35 +137,38 @@ function App() {
 
   return (
     <main className="experience" aria-label="Interactive campsite portfolio">
-      <Canvas
-        dpr={[1, 2]}
-        shadows
-        camera={{
-          position: [9.2, 6.4, 13.2],
-          fov: 40,
-          near: 0.1,
-          far: 150,
-        }}
-        gl={{
-          antialias: true,
-          alpha: false,
-          powerPreference: "high-performance",
-          outputColorSpace: SRGBColorSpace,
-          toneMapping: ACESFilmicToneMapping,
-          toneMappingExposure: 1,
-        }}
-      >
-        <Suspense fallback={null}>
-          <Experience
-            onLoaded={handleLoaded}
-            onPrepared={handleScenePrepared}
-            controlsEnabled={hasEntered && activeSection === null}
-            onSceneHover={handleSceneHover}
-            onSectionSelect={handleSectionSelect}
-            resetCameraToken={resetCameraToken}
-          />
-        </Suspense>
-      </Canvas>
+      <SceneErrorBoundary onError={handleSceneError}>
+        <Canvas
+          dpr={[1, 2]}
+          shadows
+          camera={{
+            position: [9.2, 6.4, 13.2],
+            fov: 40,
+            near: 0.1,
+            far: 150,
+          }}
+          gl={{
+            antialias: true,
+            alpha: false,
+            powerPreference: "high-performance",
+            outputColorSpace: SRGBColorSpace,
+            toneMapping: ACESFilmicToneMapping,
+            toneMappingExposure: 1,
+          }}
+        >
+          <Suspense fallback={null}>
+            <Experience
+              onModelPrepared={handleModelPrepared}
+              onCameraPrepared={handleCameraPrepared}
+              onFirstFrameRendered={handleFirstFrameRendered}
+              controlsEnabled={hasEntered && activeSection === null}
+              onSceneHover={handleSceneHover}
+              onSectionSelect={handleSectionSelect}
+              resetCameraToken={resetCameraToken}
+            />
+          </Suspense>
+        </Canvas>
+      </SceneErrorBoundary>
       <div
         ref={hoverLabelRef}
         className="scene-hover-label"
@@ -128,6 +177,7 @@ function App() {
       {!hasEntered && (
         <LoadingScreen
           isReady={isReady}
+          error={sceneError}
           isEntering={isEntering}
           onEnter={handleEnter}
           onEntered={handleEntered}

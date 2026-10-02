@@ -11,13 +11,18 @@ const MOBILE_POSITION = [40, 6, -10];
 const MAX_DISTANCE = 40;
 const MAX_POLAR_ANGLE = MathUtils.degToRad(85);
 
-export default function CameraRig({ controlsEnabled, resetCameraToken }) {
+export default function CameraRig({
+  controlsEnabled,
+  resetCameraToken,
+  onPrepared,
+}) {
   const width = useThree((state) => state.size.width);
   const height = useThree((state) => state.size.height);
   const isMobile = width < 700 || width / height < 0.85;
   const controlsRef = useRef(null);
   const resetRef = useRef(null);
   const isMobileRef = useRef(isMobile);
+  const hasPreparedRef = useRef(false);
 
   useEffect(() => {
     isMobileRef.current = isMobile;
@@ -44,6 +49,13 @@ export default function CameraRig({ controlsEnabled, resetCameraToken }) {
   useFrame((_, delta) => {
     const reset = resetRef.current;
     const controls = controlsRef.current;
+    if (controls && !hasPreparedRef.current) {
+      // Explicitly apply the authored target before readiness. This avoids
+      // deferring OrbitControls' first camera orientation until entry.
+      controls.update();
+      hasPreparedRef.current = true;
+      onPrepared();
+    }
     if (!reset || !controls) return;
 
     reset.elapsed = Math.min(reset.elapsed + delta, 1.15);

@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useThree } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 
 const warmups = new WeakMap();
 
@@ -17,31 +17,44 @@ function warmupRenderer(renderer, scene, camera) {
   return warmup;
 }
 
-export default function SceneWarmup({ onPrepared }) {
+export default function SceneWarmup({ onFirstFrameRendered }) {
   const renderer = useThree((state) => state.gl);
   const scene = useThree((state) => state.scene);
   const camera = useThree((state) => state.camera);
 
+  const compiledAtFrameRef = useRef(null);
+  const reportedRef = useRef(false);
+
   useEffect(() => {
     let cancelled = false;
-    let frame;
-    const markPreparedAfterPaint = () => {
-      frame = window.requestAnimationFrame(() => {
-        if (!cancelled) onPrepared();
-      });
+    const markCompiled = () => {
+      if (!cancelled) compiledAtFrameRef.current = renderer.info.render.frame;
     };
 
-    warmupRenderer(renderer, scene, camera).then(markPreparedAfterPaint, () => {
+    warmupRenderer(renderer, scene, camera).then(markCompiled, () => {
       // Shader parallel-compilation support varies by browser/driver. Falling
       // back preserves the existing rendered scene rather than trapping the UI.
-      markPreparedAfterPaint();
+      markCompiled();
     });
 
     return () => {
       cancelled = true;
-      if (frame !== undefined) window.cancelAnimationFrame(frame);
     };
-  }, [camera, onPrepared, renderer, scene]);
+  }, [camera, renderer, scene]);
+
+  useFrame(() => {
+    const compiledAtFrame = compiledAtFrameRef.current;
+    if (
+      compiledAtFrame !== null &&
+      renderer.info.render.frame > compiledAtFrame &&
+      !reportedRef.current
+    ) {
+      // The renderer's frame counter only advances after gl.render(), so this
+      // proves that a complete prepared frame ran behind the loading overlay.
+      reportedRef.current = true;
+      onFirstFrameRendered();
+    }
+  });
 
   return null;
 }

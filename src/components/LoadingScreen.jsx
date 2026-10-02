@@ -6,6 +6,7 @@ export default function LoadingScreen({
   isEntering,
   onEnter,
   onEntered,
+  error,
 }) {
   const screenRef = useRef(null);
   const loadingRef = useRef(null);
@@ -125,14 +126,20 @@ export default function LoadingScreen({
       aria-busy={!isReady}
     >
       <div className="loading-screen__loading" ref={loadingRef}>
-        <span>Loading</span>
-        <span className="loading-screen__dots" aria-hidden="true">
-          {[0, 1, 2].map((dot) => (
-            <span className="loading-screen__dot" key={dot}>
-              .
+        {error ? (
+          <span role="alert">{error}</span>
+        ) : (
+          <>
+            <span>Loading</span>
+            <span className="loading-screen__dots" aria-hidden="true">
+              {[0, 1, 2].map((dot) => (
+                <span className="loading-screen__dot" key={dot}>
+                  .
+                </span>
+              ))}
             </span>
-          ))}
-        </span>
+          </>
+        )}
       </div>
 
       <div className="loading-screen__ready" ref={readyRef}>

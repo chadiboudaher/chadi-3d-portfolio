@@ -19,7 +19,7 @@ const HIGHLIGHT_COLOR = new Color("#fff4d6");
 const HIGHLIGHT_AMOUNT = 0.08;
 
 export default function PortfolioModel({
-  onLoaded,
+  onPrepared,
   onSectionSelect,
   onSceneHover,
 }) {
@@ -137,7 +137,9 @@ export default function PortfolioModel({
       }
     });
 
-    onLoaded();
+    // useGLTF has resolved every model dependency by this point, and the
+    // materials used for interaction are now cloned and ready for rendering.
+    onPrepared();
     return () => {
       materialGroups.forEach((materials, sign) => {
         sign.traverse((child) => {
@@ -151,7 +153,7 @@ export default function PortfolioModel({
       hoveredSign.current = null;
       document.body.style.cursor = "default";
     };
-  }, [onLoaded, onSceneHover, scene]);
+  }, [onPrepared, onSceneHover, scene]);
 
   const handlePointerMove = useCallback(
     (event) => {

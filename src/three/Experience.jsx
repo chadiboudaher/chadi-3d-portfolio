@@ -5,8 +5,9 @@ import PortfolioModel from "./PortfolioModel";
 import SceneWarmup from "./SceneWarmup";
 
 function Experience({
-  onLoaded,
-  onPrepared,
+  onModelPrepared,
+  onCameraPrepared,
+  onFirstFrameRendered,
   controlsEnabled,
   onSectionSelect,
   onSceneHover,
@@ -18,15 +19,16 @@ function Experience({
       <fog attach="fog" args={["#ffe29a", 24, 55]} />
       <Lighting />
       <PortfolioModel
-        onLoaded={onLoaded}
+        onPrepared={onModelPrepared}
         onSectionSelect={onSectionSelect}
         onSceneHover={onSceneHover}
       />
       <CameraRig
         controlsEnabled={controlsEnabled}
         resetCameraToken={resetCameraToken}
+        onPrepared={onCameraPrepared}
       />
-      <SceneWarmup onPrepared={onPrepared} />
+      <SceneWarmup onFirstFrameRendered={onFirstFrameRendered} />
     </>
   );
 }
