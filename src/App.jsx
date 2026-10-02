@@ -169,6 +169,27 @@ function App() {
                 <path d="M13 3.5v4h4M10 12h4M10 15.5h4" />
               </svg>
             </a>
+            <a
+              className="scene-control scene-control--line"
+              href="https://www.chess.com/member/kiwi-v1"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open Chess.com profile"
+              title="Challenge me on Chess.com"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 20h11M8 17h9l1 3H7l1-3Z" />
+                <path d="M9 17c0-2 1-3.2 3-4.5l-2-2.2L11 5l5 2 2 4-2.5 2.5L14 12l-1.5 1.5" />
+                <path d="m11 5 2 4-3-1.2" />
+                <circle
+                  cx="14.5"
+                  cy="8.5"
+                  r="0.6"
+                  fill="currentColor"
+                  stroke="none"
+                />
+              </svg>
+            </a>
           </div>
 
           <SceneInterface />
