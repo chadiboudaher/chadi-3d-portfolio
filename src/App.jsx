@@ -7,6 +7,7 @@ import NavigationHint from "./components/NavigationHint";
 import SceneInterface from "./components/SceneInterface";
 import AboutPanel from "./components/AboutPanel";
 import ContactPanel from "./components/ContactPanel";
+import ProjectsPanel from "./components/ProjectsPanel";
 import SoundToggle from "./components/SoundToggle";
 
 import useAmbientAudio from "./audio/useAmbientAudio";
@@ -178,6 +179,10 @@ function App() {
 
       {activeSection === "contact" && (
         <ContactPanel onClose={handleSectionClose} />
+      )}
+
+      {activeSection === "projects" && (
+        <ProjectsPanel onClose={handleSectionClose} />
       )}
     </main>
   );

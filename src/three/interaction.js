@@ -9,6 +9,9 @@ export function isAboutObject(object) {
 export function isContactObject(object) {
   return object.name.toLowerCase().includes("contact");
 }
+export function isProjectsObject(object) {
+  return object.name.toLowerCase().includes("project");
+}
 
 export function getInteractionLabel(object) {
   const name = object.name.toLowerCase();

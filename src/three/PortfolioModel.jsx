@@ -7,6 +7,7 @@ import {
   getInteractionLabel,
   isAboutObject,
   isContactObject,
+  isProjectsObject,
   isHoverObject,
 } from "./interaction.js";
 
@@ -191,7 +192,9 @@ export default function PortfolioModel({
         ? "about"
         : isContactObject(sign)
           ? "contact"
-          : null;
+          : isProjectsObject(sign)
+            ? "projects"
+            : null;
 
       if (!section) return;
 

@@ -5,6 +5,7 @@ import {
   getInteractionLabel,
   isAboutObject,
   isContactObject,
+  isProjectsObject,
   isHoverObject,
 } from "./interaction.js";
 
@@ -36,4 +37,12 @@ test("recognizes the exported Contact sign name", () => {
   assert.equal(isHoverObject(contactSign), true);
   assert.equal(isContactObject(contactSign), true);
   assert.equal(isAboutObject(contactSign), false);
+});
+
+test("recognizes the exported Projects sign name", () => {
+  const projectsSign = { name: "sign_projects_hover", parent: null };
+
+  assert.equal(isHoverObject(projectsSign), true);
+  assert.equal(isProjectsObject(projectsSign), true);
+  assert.equal(isAboutObject(projectsSign), false);
 });
