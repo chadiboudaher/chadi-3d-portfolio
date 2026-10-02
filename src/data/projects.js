@@ -8,7 +8,7 @@ export const projects = [
     problem:
       "Reduces the manual work required to collect, clean, segment, and validate under-resourced speech data.",
     stack: ["Python", "PyTorch", "OpenCV", "FFmpeg"],
-    repo: "https://github.com/chadiboudaher",
+    repo: "https://github.com/chadiboudaher/av-leb-corpus-builder",
     accent: "coral",
   },
   {
@@ -20,7 +20,7 @@ export const projects = [
     problem:
       "Keeps long-running media jobs observable and consistent while separating API concerns from processing workers.",
     stack: ["Python", "FastAPI", "Docker", "FFmpeg"],
-    repo: "https://github.com/chadiboudaher",
+    repo: "https://github.com/chadiboudaher/ml-media-orchestrator",
     accent: "gold",
   },
   {

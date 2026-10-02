@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 *.glb
 /public/audio/*.mp3
+/public/*.png
